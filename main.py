@@ -2,6 +2,7 @@ import os.path
 import tensorflow as tf
 import helper
 import warnings
+import time
 from distutils.version import LooseVersion
 import project_tests as tests
 
