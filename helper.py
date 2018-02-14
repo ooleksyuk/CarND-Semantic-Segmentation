@@ -8,8 +8,8 @@ import zipfile
 import time
 import tensorflow as tf
 from glob import glob
-# from urllib.request import urlretrieve
-from urllib import urlretrieve
+from urllib.request import urlretrieve
+# from urllib import urlretrieve
 from tqdm import tqdm
 
 
