@@ -20,8 +20,8 @@ else:
     print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
 
 L2_REG = 1e-5
-STDEV = 1e-3
-KEEP_PROB = 0.5
+STDEV = 0.01
+KEEP_PROB = 0.8
 LEARNING_RATE = 1e-4
 EPOCHS = 20
 BATCH_SIZE = 16
@@ -54,7 +54,6 @@ def load_vgg(sess, vgg_path):
     layer7 = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
 
     return input_image, keep_prob, layer3, layer4, layer7
-print("Load VGG Model:")
 tests.test_load_vgg(load_vgg, tf)
 
 
@@ -125,7 +124,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     )
 
     return output_conv_layer
-print("Layers Test:")
 tests.test_layers(layers)
 
 
@@ -150,7 +148,6 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     train_op = optimizer.minimize(cross_entropy_loss)
 
     return logits, train_op, cross_entropy_loss
-print("Optimize Test:")
 tests.test_optimize(optimize)
 
 
@@ -188,7 +185,6 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         loss_log.append(epoch_loss / batch_count)
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
         return loss_log
-print("Train NN:")
 tests.test_train_nn(train_nn)
 
 
@@ -218,20 +214,20 @@ def run():
         learning_rate = tf.placeholder(dtype=tf.float32)
 
         logits, train_op, cross_entropy_loss = optimize(output_layer, correct_label, learning_rate, NUM_CLASSES)
-        tf.set_random_seed(123)
+        # tf.set_random_seed(123)
 
         sess.run(tf.global_variables_initializer())
 
-        loss_log = train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
+        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
                  keep_prob, learning_rate)
 
         # for i in tf.get_default_graph().get_operations():
         #     print(i.name)
 
         # Save inference data using helper.save_inference_samples
-        folder_name = helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
 
-        helper.plot_loss(RUNS_DIR, loss_log, folder_name)
+        # helper.plot_loss(RUNS_DIR, loss_log, folder_name)
 
         # OPTIONAL: Apply the trained model to a video
         # save_path = os.path.join(RUNS_DIR, 'model')
@@ -244,8 +240,6 @@ def run():
         # saver.save(sess, save_path)
         # tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
         # print('Saved normal at : {}'.format(save_path))
-print("Run Training:")
-run()
 
 if __name__ == '__main__':
     run()
