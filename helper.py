@@ -164,7 +164,7 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape)
 
         yield os.path.basename(image_file), np.array(street_im)
 
-def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image, num_classes):
+def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image):
     # Make folder for current run
     folder_name = str(time.time())
     output_dir = os.path.join(runs_dir, folder_name)
