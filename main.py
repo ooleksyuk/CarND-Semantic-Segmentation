@@ -225,8 +225,8 @@ def run():
         loss_log = train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
                  keep_prob, learning_rate)
 
-        for i in tf.get_default_graph().get_operations():
-            print(i.name)
+        # for i in tf.get_default_graph().get_operations():
+        #     print(i.name)
 
         # Save inference data using helper.save_inference_samples
         folder_name = helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
@@ -237,10 +237,9 @@ def run():
         save_path = os.path.join(RUNS_DIR, 'model')
         save_path_pb = os.path.join(RUNS_DIR, 'model.pb')
 
-        saver = tf.train.Saver(tf.trainable_variables())
+        saver = tf.train.Saver()
         saver_def = saver.as_saver_def()
-        print(saver_def.filename_tensor_name)
-        print(saver_def.restore_op_name)
+        print('Saved at : {0}:{1}'.format(saver_def.filename_tensor_name, saver_def.restore_op_name))
 
         saver.save(sess, save_path)
         tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
