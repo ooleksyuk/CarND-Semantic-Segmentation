@@ -46,12 +46,12 @@ def load_vgg(sess, vgg_path):
     vgg_layer7_out_tensor_name = 'layer7_out:0'
     graph = tf.get_default_graph()
     tf.saved_model.loader.load(sess, [vgg_tag], vgg_path)
-    input = graph.get_tensor_by_name(vgg_input_tensor_name)
+    input_image = graph.get_tensor_by_name(vgg_input_tensor_name)
     keep_prob = graph.get_tensor_by_name(vgg_keep_prob_tensor_name)
     layer3 = graph.get_tensor_by_name(vgg_layer3_out_tensor_name)
     layer4 = graph.get_tensor_by_name(vgg_layer4_out_tensor_name)
     layer7 = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
-    return input, keep_prob, layer3, layer4, layer7
+    return input_image, keep_prob, layer3, layer4, layer7
 
 print("Load VGG Model:")
 tests.test_load_vgg(load_vgg, tf)
@@ -168,7 +168,7 @@ def run():
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
         # Add some augmentations, see helper.py
-        input, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
+        input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
         output = layers(layer3, layer4, layer7, NUM_CLASSES)
         correct_label = tf.placeholder(dtype = tf.float32, shape = (None, None, None, NUM_CLASSES))
         learning_rate = tf.placeholder(dtype = tf.float32)
@@ -176,10 +176,10 @@ def run():
         tf.set_random_seed(123)
         sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver() #Simple model saver
-        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input, correct_label,
+        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
                  keep_prob, learning_rate,  saver, MODEL_DIR)
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input, NUM_CLASSES)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image, NUM_CLASSES)
 
         # OPTIONAL: Apply the trained model to a video
 print("Run Training:")
@@ -191,7 +191,7 @@ def save_samples():
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
         get_batches_fn = helper.gen_batch_function(os.path.join(DATA_DIR, 'data_road/training'), IMAGE_SHAPE)
-        input, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
+        input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
         output = layers(layer3, layer4, layer7, NUM_CLASSES)
         correct_label = tf.placeholder(dtype = tf.float32, shape = (None, None, None, NUM_CLASSES))
         learning_rate = tf.placeholder(dtype = tf.float32)
@@ -200,7 +200,7 @@ def save_samples():
         new_saver = tf.train.import_meta_graph('./models_3col/epoch_199.ckpt.meta')
         new_saver.restore(sess, tf.train.latest_checkpoint('./models_3col/'))
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input, NUM_CLASSES)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image, NUM_CLASSES)
 print("Save Templates:")
 save_samples()
 
@@ -210,7 +210,7 @@ def cont():
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
         get_batches_fn = helper.gen_batch_function(os.path.join(DATA_DIR, 'data_road/training'), IMAGE_SHAPE)
-        input, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
+        input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
         output = layers(layer3, layer4, layer7, NUM_CLASSES)
         correct_label = tf.placeholder(dtype = tf.float32, shape = (None, None, None, NUM_CLASSES))
         learning_rate = tf.placeholder(dtype = tf.float32)
@@ -219,9 +219,9 @@ def cont():
         new_saver = tf.train.import_meta_graph('./models_3col/epoch_199.ckpt.meta')
         new_saver.restore(sess, tf.train.latest_checkpoint('./models_3col/'))
         saver = tf.train.Saver() #Simple model saver
-        train_nn(sess, 10, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input, correct_label,
+        train_nn(sess, 10, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
                  keep_prob, learning_rate,  saver, MODEL_DIR)
-        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input, NUM_CLASSES)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image, NUM_CLASSES)
 print("Train Model Cont Function:")
 cont()
 
