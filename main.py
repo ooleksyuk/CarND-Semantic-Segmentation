@@ -176,7 +176,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         batch_count = 0
         s_time = time.time()
         for image, labels in get_batches_fn(batch_size):
-            _, loss = sess.run(
+            loss, _ = sess.run(
                 [train_op, cross_entropy_loss],
                 feed_dict={input_image: image,
                            correct_label: labels,
@@ -234,16 +234,16 @@ def run():
         helper.plot_loss(RUNS_DIR, loss_log, folder_name)
 
         # OPTIONAL: Apply the trained model to a video
-        save_path = os.path.join(RUNS_DIR, 'model')
-        save_path_pb = os.path.join(RUNS_DIR, 'model.pb')
-
-        saver = tf.train.Saver()
-        saver_def = saver.as_saver_def()
-        print('Saved at : {0}:{1}'.format(saver_def.filename_tensor_name, saver_def.restore_op_name))
-
-        saver.save(sess, save_path)
-        tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
-        print('Saved normal at : {}'.format(save_path))
+        # save_path = os.path.join(RUNS_DIR, 'model')
+        # save_path_pb = os.path.join(RUNS_DIR, 'model.pb')
+        #
+        # saver = tf.train.Saver()
+        # saver_def = saver.as_saver_def()
+        # print('Saved at : {0}:{1}'.format(saver_def.filename_tensor_name, saver_def.restore_op_name))
+        #
+        # saver.save(sess, save_path)
+        # tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
+        # print('Saved normal at : {}'.format(save_path))
 print("Run Training:")
 run()
 
