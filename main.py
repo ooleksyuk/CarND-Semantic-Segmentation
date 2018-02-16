@@ -163,7 +163,7 @@ tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
-             correct_label, keep_prob, learning_rate):
+             correct_label, keep_prob, learning_rate, saver):
     """
     Train neural network and print out the loss during training.
     :param sess: TF Session
@@ -188,12 +188,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            keep_prob: KEEP_PROB,
                            learning_rate: LEARNING_RATE}
             )
-            saver = tf.train.Saver()
             saver.save(sess, os.path.join(DATA_DIR, 'cont_epoch_' + str(epoch) + '.ckpt'))
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
 
 
-tests.test_train_nn(train_nn)
+# tests.test_train_nn(train_nn)
 
 
 def run():
@@ -226,8 +225,9 @@ def run():
 
         sess.run(tf.global_variables_initializer())
 
+        saver = tf.train.Saver()
         train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
-                 keep_prob, learning_rate)
+                 keep_prob, learning_rate, saver)
 
         # for i in tf.get_default_graph().get_operations():
         #     print(i.name)
