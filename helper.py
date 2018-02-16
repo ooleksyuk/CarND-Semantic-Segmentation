@@ -16,6 +16,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
+import cv2
 
 
 class DLProgress(tqdm):
@@ -112,8 +113,16 @@ def gen_batch_function(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image_file = label_paths[os.path.basename(image_file)]
 
-                image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
-                gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
+                # image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
+                # gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
+                image = cv2.imread(image_file)
+                gt_image = cv2.imread(gt_image_file)
+                image, gt_image = random_crop(image, gt_image) #Random crop augmentation
+                image = cv2.resize(image, image_shape)
+                contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
+                bright = random.randint(-45, 30)  # Brightness augmentation
+                image = bc_img(image, contrast, bright)
+                gt_image = cv2.resize(gt_image, image_shape)
 
                 gt_bg = np.all(gt_image == background_color, axis=2)
                 gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
