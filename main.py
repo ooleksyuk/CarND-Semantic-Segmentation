@@ -19,6 +19,7 @@ if not tf.test.gpu_device_name():
 else:
     print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
 
+
 L2_REG = 1e-5
 STDEV = 0.01
 KEEP_PROB = 0.8
@@ -31,6 +32,7 @@ NUM_CLASSES = 2
 DATA_DIR = './data'
 RUNS_DIR = './runs'
 MODEL_DIR = './models_3col'
+
 
 def load_vgg(sess, vgg_path):
     """
@@ -57,6 +59,8 @@ def load_vgg(sess, vgg_path):
     layer7 = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
 
     return input_image, keep_prob, layer3, layer4, layer7
+
+
 tests.test_load_vgg(load_vgg, tf)
 
 
@@ -127,6 +131,8 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     )
 
     return output_conv_layer
+
+
 tests.test_layers(layers)
 
 
@@ -151,6 +157,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     train_op = optimizer.minimize(cross_entropy_loss)
 
     return logits, train_op, cross_entropy_loss
+
+
 tests.test_optimize(optimize)
 
 
@@ -169,11 +177,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    # loss_log = []
     for epoch in range(epochs):
         loss = None
-        # epoch_loss = 0
-        # batch_count = 0
         s_time = time.time()
         for image, labels in get_batches_fn(batch_size):
             _, loss = sess.run(
@@ -183,11 +188,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            keep_prob: KEEP_PROB,
                            learning_rate: LEARNING_RATE}
             )
-            # epoch_loss += loss
-            # batch_count += 1
-        # loss_log.append(epoch_loss / batch_count)
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
-        # return loss_log
+
+
 tests.test_train_nn(train_nn)
 
 
