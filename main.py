@@ -45,10 +45,13 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
+
     graph = tf.get_default_graph()
     tf.saved_model.loader.load(sess, [vgg_tag], vgg_path)
+
     input_image = graph.get_tensor_by_name(vgg_input_tensor_name)
     keep_prob = graph.get_tensor_by_name(vgg_keep_prob_tensor_name)
+
     layer3 = graph.get_tensor_by_name(vgg_layer3_out_tensor_name)
     layer4 = graph.get_tensor_by_name(vgg_layer4_out_tensor_name)
     layer7 = graph.get_tensor_by_name(vgg_layer7_out_tensor_name)
@@ -142,7 +145,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     labels = tf.reshape(correct_label, (-1, num_classes))
 
     cross_entropy_loss = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(logits=logits,labels=labels)
+        tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
     )
     optimizer = tf.train.AdamOptimizer(learning_rate)
     train_op = optimizer.minimize(cross_entropy_loss)
@@ -166,11 +169,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    loss_log = []
+    # loss_log = []
     for epoch in range(epochs):
         loss = None
-        epoch_loss = 0
-        batch_count = 0
+        # epoch_loss = 0
+        # batch_count = 0
         s_time = time.time()
         for image, labels in get_batches_fn(batch_size):
             _, loss = sess.run(
@@ -180,11 +183,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            keep_prob: KEEP_PROB,
                            learning_rate: LEARNING_RATE}
             )
-            epoch_loss += loss
-            batch_count += 1
-        loss_log.append(epoch_loss / batch_count)
+            # epoch_loss += loss
+            # batch_count += 1
+        # loss_log.append(epoch_loss / batch_count)
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
-        return loss_log
+        # return loss_log
 tests.test_train_nn(train_nn)
 
 

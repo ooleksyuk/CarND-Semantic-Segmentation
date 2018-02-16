@@ -13,9 +13,10 @@ import tensorflow as tf
 from glob import glob
 from urllib.request import urlretrieve
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+
 
 class DLProgress(tqdm):
     last_block = 0
@@ -62,9 +63,11 @@ def maybe_download_pretrained_vgg(data_dir):
         # Remove zip file to save space
         os.remove(os.path.join(vgg_path, vgg_filename))
 
+
 def img_size(img):
     return (img.shape[0], img.shape[1])
-    
+
+
 def random_crop(img, gt):
     h,w = img_size(img)
     nw = random.randint(1150, w-5) # Random crop size
@@ -72,15 +75,17 @@ def random_crop(img, gt):
     x1 = random.randint(0, w - nw) # Random position of crop
     y1 = random.randint(0, h - nh)
     return img[y1:(y1+nh), x1:(x1+nw), :], gt[y1:(y1+nh), x1:(x1+nw), :]
-    
+
+
 def bc_img(img, s = 1.0, m = 0.0):
     img = img.astype(np.int)
     img = img * s + m
     img[img > 255] = 255
     img[img < 0] = 0
     img = img.astype(np.uint8)
-    return img    
-    
+    return img
+
+
 def gen_batch_function(data_folder, image_shape):
     """
     Generate function to create batches of training data
@@ -121,9 +126,11 @@ def gen_batch_function(data_folder, image_shape):
 
     return get_batches_fn
 
+
 def denoise_img(img):
     eroded_img = ndimage.binary_erosion(img)
     return ndimage.binary_propagation(eroded_img, mask=img)
+
 
 def test_video(sess, logits, keep_prob, input_image, clip, image_shape, up_scale_size):
     image = clip
@@ -137,6 +144,7 @@ def test_video(sess, logits, keep_prob, input_image, clip, image_shape, up_scale
     street_im.paste(mask, box=None, mask=mask)
 
     return np.array(street_im)
+
 
 def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape):
     """
@@ -164,10 +172,10 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape)
 
         yield os.path.basename(image_file), np.array(street_im)
 
+
 def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image):
     # Make folder for current run
-    folder_name = str(time.time())
-    output_dir = os.path.join(runs_dir, folder_name)
+    output_dir = os.path.join(runs_dir, str(time.time()))
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
     os.makedirs(output_dir)
@@ -179,7 +187,7 @@ def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_p
     )
     for name, image in image_outputs:
         scipy.misc.imsave(os.path.join(output_dir, name), image)
-    return folder_name
+
 
 def plot_loss(runs_dir, loss, folder_name):
     _, axes = plt.subplots()
