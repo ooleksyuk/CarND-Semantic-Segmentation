@@ -78,7 +78,7 @@ def random_crop(img, gt):
     return img[y1:(y1+nh), x1:(x1+nw), :], gt[y1:(y1+nh), x1:(x1+nw), :]
 
 
-def bc_img(img, s = 1.0, m = 0.0):
+def bc_img(img, s=1.0, m=0.0):
     img = img.astype(np.int)
     img = img * s + m
     img[img > 255] = 255
@@ -117,7 +117,7 @@ def gen_batch_function(data_folder, image_shape):
                 # gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
                 image = cv2.imread(image_file)
                 gt_image = cv2.imread(gt_image_file)
-                # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
+                image, gt_image = random_crop(image, gt_image) #Random crop augmentation
                 image = cv2.resize(image, image_shape)
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
