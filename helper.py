@@ -117,7 +117,7 @@ def gen_batch_function(data_folder, image_shape):
                 # gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
                 image = cv2.imread(image_file)
                 gt_image = cv2.imread(gt_image_file)
-                image, gt_image = random_crop(image, gt_image) #Random crop augmentation
+                # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
                 image = cv2.resize(image, image_shape)
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
