@@ -188,7 +188,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            keep_prob: KEEP_PROB,
                            learning_rate: LEARNING_RATE}
             )
-            saver.save(sess, os.path.join(DATA_DIR, 'cont_epoch_' + str(epoch) + '.ckpt'))
+            if epoch % 10 == 0:
+                saver.save(sess, os.path.join(DATA_DIR, 'checkpoints/cont_epoch_' + str(epoch) + '.ckpt'))
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
 
 
