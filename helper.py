@@ -71,9 +71,9 @@ def img_size(img):
 
 def random_crop(img, gt):
     h,w = img_size(img)
-    nw = random.randint(1150, w-5) # Random crop size
+    nw = random.randint(1150, w-5)  # Random crop size
     nh = int(nw / 3.3) # Keep original aspect ration
-    x1 = random.randint(0, w - nw) # Random position of crop
+    x1 = random.randint(0, w - nw)  # Random position of crop
     y1 = random.randint(0, h - nh)
     return img[y1:(y1+nh), x1:(x1+nw), :], gt[y1:(y1+nh), x1:(x1+nw), :]
 
@@ -113,16 +113,27 @@ def gen_batch_function(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image_file = label_paths[os.path.basename(image_file)]
 
-                # image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
-                # gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
-                image = cv2.imread(image_file)
-                gt_image = cv2.imread(gt_image_file)
+                image = scipy.misc.imread(image_file)
+                print(type(image))
+                image = scipy.misc.imresize(image, image_shape)
+                print(type(image))
+
+                gt_image = scipy.misc.imread(gt_image_file)
+                print(type(gt_image))
+                gt_image = scipy.misc.imresize(gt_image, image_shape)
+                print(type(gt_image))
+
+                # image = cv2.imread(image_file)
+                # gt_image = cv2.imread(gt_image_file)
+
                 # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
-                image = cv2.resize(image, image_shape)
-                # contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
-                # bright = random.randint(-45, 30)  # Brightness augmentation
-                # image = bc_img(image, contrast, bright)
-                gt_image = cv2.resize(gt_image, image_shape)
+
+                # image = cv2.resize(image, image_shape)
+                # gt_image = cv2.resize(gt_image, image_shape)
+
+                contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
+                bright = random.randint(-45, 30)  # Brightness augmentation
+                image = bc_img(image, contrast, bright)
 
                 gt_bg = np.all(gt_image == background_color, axis=2)
                 gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
