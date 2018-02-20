@@ -23,7 +23,7 @@ L2_REG = 1e-5
 STDEV = 1e-2
 KEEP_PROB = 0.8
 LEARNING_RATE = 1e-4
-EPOCHS = 40
+EPOCHS = 20
 BATCH_SIZE = 8
 IMAGE_SHAPE = (160, 576)
 NUM_CLASSES = 2
@@ -200,7 +200,7 @@ tests.test_train_nn(train_nn)
 
 def run():
     tests.test_for_kitti_dataset(DATA_DIR)
-    # Download pretrained vgg model
+    # Download pre trained vgg model
     helper.maybe_download_pretrained_vgg(DATA_DIR)
 
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
@@ -208,9 +208,14 @@ def run():
     # https://www.cityscapes-dataset.com/
 
     print("Start training...")
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    config = tf.ConfigProto()
+    config.gpu_options.allocator_type = 'BFC'
+    config.gpu_options.per_process_gpu_memory_fraction = 0.4
+    config.gpu_options.device_count = 2
+    config.gpu_options.per_process_gpu_memory_fraction = 0.9
+    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
     tf.reset_default_graph()
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    with tf.Session(config=config) as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
@@ -225,33 +230,15 @@ def run():
         learning_rate = tf.placeholder(dtype=tf.float32)
 
         logits, train_op, cross_entropy_loss = optimize(output_layer, correct_label, learning_rate, NUM_CLASSES)
-        # tf.set_random_seed(123)
 
         sess.run(tf.global_variables_initializer())
 
-        saver = tf.train.Saver()
-        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
-                 keep_prob, learning_rate)
-
-        # for i in tf.get_default_graph().get_operations():
-        #     print(i.name)
+        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
         helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
 
-        # helper.plot_loss(RUNS_DIR, loss_log, folder_name)
-
         # OPTIONAL: Apply the trained model to a video
-        # save_path = os.path.join(RUNS_DIR, 'model')
-        # save_path_pb = os.path.join(RUNS_DIR, 'model.pb')
-        #
-        # saver = tf.train.Saver()
-        # saver_def = saver.as_saver_def()
-        # print('Saved at : {0}:{1}'.format(saver_def.filename_tensor_name, saver_def.restore_op_name))
-        #
-        # saver.save(sess, save_path)
-        # tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
-        # print('Saved normal at : {}'.format(save_path))
 
 
 if __name__ == '__main__':

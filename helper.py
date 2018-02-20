@@ -89,11 +89,39 @@ def bc_img(img, s=1.0, m=0.0):
     return img
 
 
-def process_gt_image(gt_image, background_color):
+def process_gt_image(gt_image):
+    background_color = np.array([255, 0, 0])
+
     gt_bg = np.all(gt_image == background_color, axis=2)
-    gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+    w = gt_bg.shape[0]
+    h = gt_bg.shape[1]
+    gt_bg = gt_bg.reshape(w, h, 1)
     gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
     return gt_image
+
+
+def process_gt_city_images(gt_image):
+    road_color = np.array([128, 64, 128, 255])
+    car_color = np.array([0, 0, 142, 255])
+    sign_color = np.array([220, 220, 0, 255])
+
+    gt_road = np.all(gt_image == road_color, axis=2)
+    gt_road = gt_road.reshape(*gt_road.shape, 1)
+
+    gt_car = np.all(gt_image == car_color, axis=2)
+    gt_car = gt_car.reshape(*gt_car.shape, 1)
+
+    gt_sing = np.all(gt_image == sign_color, axis=2)
+    gt_sing = gt_sing.reshape(*gt_sing.shape, 1)
+
+    gt_obj = np.concatenate((gt_road, gt_car, gt_sing), axis=2)
+    gt_bg = np.all(gt_obj == 0, axis=2)
+    gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+
+    gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+
+    return gt_image
+
 
 def gen_batch_function(data_folder, image_shape):
     """
@@ -112,7 +140,6 @@ def gen_batch_function(data_folder, image_shape):
         label_paths = {
             re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
             for path in glob(os.path.join(data_folder, 'gt_image_2', '*_road_*.png'))}
-        background_color = np.array([255, 0, 0])
 
         random.shuffle(image_paths)
         for batch_i in range(0, len(image_paths), batch_size):
@@ -146,9 +173,9 @@ def gen_batch_function(data_folder, image_shape):
                 bright = random.randint(-45, 30)  # Brightness augmentation
                 image = bc_img(image, contrast, bright)
 
-                gt_image = process_gt_image(gt_image, background_color)
-                gt_image2 = process_gt_image(gt_image2, background_color)
-                gt_image3 = process_gt_image(gt_image3, background_color)
+                gt_image = process_gt_image(gt_image)
+                gt_image2 = process_gt_image(gt_image2)
+                gt_image3 = process_gt_image(gt_image3)
 
                 images.append(image)
                 gt_images.append(gt_image)
