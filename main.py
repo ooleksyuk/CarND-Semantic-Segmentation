@@ -209,7 +209,7 @@ def run():
 
     print("Start training...")
     config = tf.ConfigProto()
-    config.gpu_options.allocator_type = 'BFC'
+    # config.gpu_options.allocator_type = 'BFC'
     config.gpu_options.per_process_gpu_memory_fraction = 0.4
     config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
     tf.reset_default_graph()
