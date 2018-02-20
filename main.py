@@ -231,7 +231,7 @@ def run():
 
         saver = tf.train.Saver()
         train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label,
-                 keep_prob, learning_rate, saver)
+                 keep_prob, learning_rate)
 
         # for i in tf.get_default_graph().get_operations():
         #     print(i.name)

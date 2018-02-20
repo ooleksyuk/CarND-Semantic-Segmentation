@@ -200,6 +200,6 @@ def plot_loss(runs_dir, loss, folder_name):
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.grid()
-    
+
     output_file = os.path.join(runs_dir, folder_name + ".png")
     plt.savefig(output_file)
