@@ -134,15 +134,15 @@ def gen_batch_function(data_folder, image_shape):
                 # print(type(image2))  # <class 'numpy.ndarray'>
                 gt_image = cv2.resize(gt_image, (image_shape[1], image_shape[0]))
                 # print(type(gt_image2))  # <class 'numpy.ndarray'>
-                if batch_i == 0:
-                    print("\nImage:\n")
-                    print(type(image))
-                    print(image.shape)
-                    print("\nImage 2:\n")
-                    print("\n============\nGT Image:\n")
-                    print(type(gt_image))
-                    print(gt_image.shape)
-                    print("\nGT Image 2:\n")
+                # if batch_i == 0:
+                #     print("\nImage:\n")
+                #     print(type(image))
+                #     print(image.shape)
+                #     print("\nImage 2:\n")
+                #     print("\n============\nGT Image:\n")
+                #     print(type(gt_image))
+                #     print(gt_image.shape)
+                #     print("\nGT Image 2:\n")
 
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
