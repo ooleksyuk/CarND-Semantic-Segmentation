@@ -211,7 +211,7 @@ def run():
     config = tf.ConfigProto()
     config.gpu_options.allocator_type = 'BFC'
     config.gpu_options.per_process_gpu_memory_fraction = 0.4
-    config.gpu_options.device_count = 2
+    config.gpu_options.device_count = 1
     config.gpu_options.per_process_gpu_memory_fraction = 0.9
     config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
     tf.reset_default_graph()
