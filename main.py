@@ -207,6 +207,7 @@ def run():
 
     print("Start training...")
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    tf.reset_default_graph()
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
