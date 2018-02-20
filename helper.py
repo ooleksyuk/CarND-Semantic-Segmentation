@@ -115,19 +115,19 @@ def gen_batch_function(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image_file = label_paths[os.path.basename(image_file)]
 
-                # image = scipy.misc.imread(image_file)
-                # image = scipy.misc.imresize(image, image_shape)
+                image = scipy.misc.imread(image_file)
+                gt_image = scipy.misc.imread(gt_image_file)
 
-                # gt_image = scipy.misc.imread(gt_image_file)
-                # gt_image = scipy.misc.imresize(gt_image, image_shape)
+                image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
 
-                image = cv2.imread(image_file)
-                gt_image = cv2.imread(gt_image_file)
+                image = scipy.misc.imresize(image, image_shape)
+                gt_image = scipy.misc.imresize(gt_image, image_shape)
 
-                # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
+                # image = cv2.imread(image_file)
+                # gt_image = cv2.imread(gt_image_file)
 
-                image = cv2.resize(image, (image_shape[1], image_shape[0]))
-                gt_image = cv2.resize(gt_image, (image_shape[1], image_shape[0]))
+                # image = cv2.resize(image, (image_shape[1], image_shape[0]))
+                # gt_image = cv2.resize(gt_image, (image_shape[1], image_shape[0]))
 
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
