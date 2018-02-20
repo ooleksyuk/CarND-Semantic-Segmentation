@@ -113,27 +113,40 @@ def gen_batch_function(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image_file = label_paths[os.path.basename(image_file)]
 
-                # image = scipy.misc.imread(image_file)
+                image = scipy.misc.imread(image_file)
                 # print(type(image))  # <class 'numpy.ndarray'>
-                # image = scipy.misc.imresize(image, image_shape)
+                image = scipy.misc.imresize(image, image_shape)
                 # print(type(image))  # <class 'numpy.ndarray'>
 
-                # gt_image = scipy.misc.imread(gt_image_file)
+                gt_image = scipy.misc.imread(gt_image_file)
                 # print(type(gt_image))  # <class 'numpy.ndarray'>
-                # gt_image = scipy.misc.imresize(gt_image, image_shape)
+                gt_image = scipy.misc.imresize(gt_image, image_shape)
                 # print(type(gt_image))  # <class 'numpy.ndarray'>
 
-                image = cv2.imread(image_file)
-                print(type(image))
-                gt_image = cv2.imread(gt_image_file)
-                print(type(gt_image))
+                image2 = cv2.imread(image_file)
+                # print(type(image))  # <class 'numpy.ndarray'>
+                gt_image2 = cv2.imread(gt_image_file)
+                # print(type(gt_image))  # <class 'numpy.ndarray'>
 
                 # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
 
-                image = cv2.resize(image, image_shape)
-                print(type(image))
-                gt_image = cv2.resize(gt_image, image_shape)
-                print(type(gt_image))
+                image2 = cv2.resize(image2, image_shape)
+                # print(type(image2))  # <class 'numpy.ndarray'>
+                gt_image2 = cv2.resize(gt_image2, image_shape)
+                # print(type(gt_image2))  # <class 'numpy.ndarray'>
+                if batch_i == 0:
+                    print("\nImage:\n")
+                    print(type(image))
+                    print(image.shape)
+                    print("\nImage 2:\n")
+                    print(type(image2))
+                    print(image2.shape)
+                    print("\n============\nGT Image:\n")
+                    print(type(gt_image))
+                    print(gt_image.shape)
+                    print("\nGT Image 2:\n")
+                    print(type(gt_image2))
+                    print(gt_image2.shape)
 
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
