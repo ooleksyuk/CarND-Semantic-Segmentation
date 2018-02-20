@@ -114,35 +114,18 @@ def gen_batch_function(data_folder, image_shape):
                 gt_image_file = label_paths[os.path.basename(image_file)]
 
                 # image = scipy.misc.imread(image_file)
-                # print(type(image))  # <class 'numpy.ndarray'>
                 # image = scipy.misc.imresize(image, image_shape)
-                # print(type(image))  # <class 'numpy.ndarray'>
 
                 # gt_image = scipy.misc.imread(gt_image_file)
-                # print(type(gt_image))  # <class 'numpy.ndarray'>
                 # gt_image = scipy.misc.imresize(gt_image, image_shape)
-                # print(type(gt_image))  # <class 'numpy.ndarray'>
 
                 image = cv2.imread(image_file)
-                # print(type(image))  # <class 'numpy.ndarray'>
                 gt_image = cv2.imread(gt_image_file)
-                # print(type(gt_image))  # <class 'numpy.ndarray'>
 
                 # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
 
                 image = cv2.resize(image, (image_shape[1], image_shape[0]))
-                # print(type(image2))  # <class 'numpy.ndarray'>
                 gt_image = cv2.resize(gt_image, (image_shape[1], image_shape[0]))
-                # print(type(gt_image2))  # <class 'numpy.ndarray'>
-                # if batch_i == 0:
-                #     print("\nImage:\n")
-                #     print(type(image))
-                #     print(image.shape)
-                #     print("\nImage 2:\n")
-                #     print("\n============\nGT Image:\n")
-                #     print(type(gt_image))
-                #     print(gt_image.shape)
-                #     print("\nGT Image 2:\n")
 
                 contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-45, 30)  # Brightness augmentation
@@ -163,20 +146,6 @@ def gen_batch_function(data_folder, image_shape):
 def denoise_img(img):
     eroded_img = ndimage.binary_erosion(img)
     return ndimage.binary_propagation(eroded_img, mask=img)
-
-
-def test_video(sess, logits, keep_prob, input_image, clip, image_shape, up_scale_size):
-    image = clip
-
-    im_softmax = sess.run([tf.nn.softmax(logits)], {keep_prob: 0.6, input_image: [image]})
-    im_softmax = im_softmax[0][:, 1].reshape(image_shape[1], image_shape[0])
-    segmentation = (im_softmax > 0.5).reshape(image_shape[1], image_shape[0], 1)
-    mask = np.dot(segmentation, np.array([[0, 255, 0, 127]]))
-    mask = scipy.misc.toimage(mask, mode="RGBA")
-    street_im = scipy.misc.toimage(image)
-    street_im.paste(mask, box=None, mask=mask)
-
-    return np.array(street_im)
 
 
 def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape):

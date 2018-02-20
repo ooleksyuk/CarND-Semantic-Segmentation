@@ -6,7 +6,6 @@ import time
 from datetime import timedelta
 from distutils.version import LooseVersion
 import project_tests as tests
-import freeze
 
 
 # Check TensorFlow Version
@@ -177,6 +176,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
+    losses = []
     for epoch in range(epochs):
         loss = None
         s_time = time.time()
@@ -188,12 +188,14 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            keep_prob: KEEP_PROB,
                            learning_rate: LEARNING_RATE}
             )
+            losses.append(loss)
             # if epoch % 10 == 0:
             #     saver.save(sess, os.path.join(DATA_DIR, 'checkpoints/cont_epoch_' + str(epoch) + '.ckpt'))
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
+    helper.plot_loss(RUNS_DIR, losses, "loss_graph")
 
 
-# tests.test_train_nn(train_nn)
+tests.test_train_nn(train_nn)
 
 
 def run():
@@ -250,6 +252,7 @@ def run():
         # saver.save(sess, save_path)
         # tf.train.write_graph(sess.graph_def, '.', save_path_pb, as_text=False)
         # print('Saved normal at : {}'.format(save_path))
+
 
 if __name__ == '__main__':
     run()
