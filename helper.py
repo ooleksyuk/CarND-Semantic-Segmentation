@@ -14,8 +14,10 @@ from glob import glob
 from urllib.request import urlretrieve
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
+# import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import cv2
 
 
@@ -198,6 +200,6 @@ def plot_loss(runs_dir, loss, folder_name):
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.grid()
-
+    
     output_file = os.path.join(runs_dir, folder_name + ".png")
     plt.savefig(output_file)
