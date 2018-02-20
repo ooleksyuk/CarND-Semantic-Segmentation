@@ -21,7 +21,7 @@ else:
 
 
 L2_REG = 1e-5
-STDEV = 1e-3
+STDEV = 1e-2
 KEEP_PROB = 0.8
 LEARNING_RATE = 1e-4
 EPOCHS = 20
