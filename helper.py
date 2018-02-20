@@ -14,11 +14,7 @@ from glob import glob
 from urllib.request import urlretrieve
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-# import matplotlib
-# matplotlib.use('Agg')
-# import matplotlib.pyplot as plt
 plt.switch_backend('agg')
-import cv2
 
 
 class DLProgress(tqdm):
@@ -67,17 +63,21 @@ def maybe_download_pretrained_vgg(data_dir):
         os.remove(os.path.join(vgg_path, vgg_filename))
 
 
-def img_size(img):
-    return (img.shape[0], img.shape[1])
+def img_size(image):
+    return image.shape[0], image.shape[1]
 
 
-def random_crop(img, gt):
-    h,w = img_size(img)
+def crop_image(image, gt_image):
+    h, w = img_size(image)
     nw = random.randint(1150, w-5)  # Random crop size
     nh = int(nw / 3.3) # Keep original aspect ration
     x1 = random.randint(0, w - nw)  # Random position of crop
     y1 = random.randint(0, h - nh)
-    return img[y1:(y1+nh), x1:(x1+nw), :], gt[y1:(y1+nh), x1:(x1+nw), :]
+    return image[y1:(y1+nh), x1:(x1+nw), :], gt_image[y1:(y1+nh), x1:(x1+nw), :]
+
+
+def flip_image(image, gt_image):
+    return np.flipud(image), np.flipud(gt_image)
 
 
 def bc_img(img, s=1.0, m=0.0):
@@ -88,6 +88,12 @@ def bc_img(img, s=1.0, m=0.0):
     img = img.astype(np.uint8)
     return img
 
+
+def process_gt_image(gt_image, background_color):
+    gt_bg = np.all(gt_image == background_color, axis=2)
+    gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+    gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+    return gt_image
 
 def gen_batch_function(data_folder, image_shape):
     """
@@ -118,10 +124,17 @@ def gen_batch_function(data_folder, image_shape):
                 image = scipy.misc.imread(image_file)
                 gt_image = scipy.misc.imread(gt_image_file)
 
-                image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
+                image2, gt_image2 = crop_image(image, gt_image)  # Random crop augmentation
+                image3, gt_image3 = flip_image(image, gt_image)
 
                 image = scipy.misc.imresize(image, image_shape)
                 gt_image = scipy.misc.imresize(gt_image, image_shape)
+
+                image2 = scipy.misc.imresize(image2, image_shape)
+                gt_image2 = scipy.misc.imresize(gt_image2, image_shape)
+
+                image3 = scipy.misc.imresize(image3, image_shape)
+                gt_image3 = scipy.misc.imresize(gt_image3, image_shape)
 
                 # image = cv2.imread(image_file)
                 # gt_image = cv2.imread(gt_image_file)
@@ -133,12 +146,18 @@ def gen_batch_function(data_folder, image_shape):
                 bright = random.randint(-45, 30)  # Brightness augmentation
                 image = bc_img(image, contrast, bright)
 
-                gt_bg = np.all(gt_image == background_color, axis=2)
-                gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
-                gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+                gt_image = process_gt_image(gt_image, background_color)
+                gt_image2 = process_gt_image(gt_image2, background_color)
+                gt_image3 = process_gt_image(gt_image3, background_color)
 
                 images.append(image)
                 gt_images.append(gt_image)
+
+                images.append(image2)
+                gt_images.append(gt_image2)
+
+                images.append(image3)
+                gt_images.append(gt_image3)
 
             yield np.array(images), np.array(gt_images)
 
@@ -200,6 +219,9 @@ def plot_loss(runs_dir, loss, folder_name):
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.grid()
+    if os.path.exists(runs_dir):
+        shutil.rmtree(runs_dir)
+    os.makedirs(runs_dir)
 
     output_file = os.path.join(runs_dir, folder_name + ".png")
     plt.savefig(output_file)
