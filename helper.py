@@ -130,9 +130,9 @@ def gen_batch_function(data_folder, image_shape):
 
                 # image, gt_image = random_crop(image, gt_image) #Random crop augmentation
 
-                image2 = cv2.resize(image2, image_shape)
+                image2 = cv2.resize(image2, (image_shape[1], image_shape[0]))
                 # print(type(image2))  # <class 'numpy.ndarray'>
-                gt_image2 = cv2.resize(gt_image2, image_shape)
+                gt_image2 = cv2.resize(gt_image2, (image_shape[1], image_shape[0]))
                 # print(type(gt_image2))  # <class 'numpy.ndarray'>
                 if batch_i == 0:
                     print("\nImage:\n")
