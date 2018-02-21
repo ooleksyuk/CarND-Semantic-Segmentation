@@ -2,6 +2,37 @@
 ### Introduction
 In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
 
+### Reflections. Rubric
+#### Does the project load the pre-trained vgg model?
+The function `load_vgg` loads `vgg` model.
+#### Does the project learn the correct features from the images?
+The project has `layers` function implemented.
+#### Does the project optimize the neural network?
+The project has `optimize` function implemented.
+#### Does the project train the neural network?
+The `train_nn` function is implemented and prints time and loss per epoch/epochs of training.
+#### Does the project train the model correctly?
+The project trains model correctly, about 48s per epoch, 48sx20 epochs in total.
+#### Does the project use reasonable hyper parameters?
+I have trained model many times to figure out reasonable set of params.
+I used:
+```bash
+L2_REG = 1e-5
+STDEV = 1e-2
+KEEP_PROB = 0.8
+LEARNING_RATE = 1e-4
+EPOCHS = 20
+BATCH_SIZE = 8
+IMAGE_SHAPE = (160, 576)
+NUM_CLASSES = 2
+```
+#### Does the project correctly label the road?
+Yes, I've tested the project on images from the dataset and here is the result:
+![KITI data set](./kiti-dataset.gif)
+
+I was tracking the loss during the training and here is a graph that describes my results:
+![Cross-entropy loss](./runs/1519163452.0202436/loss_graph.png)
+
 ### Setup
 ##### Frameworks and Packages
 Make sure you have the following is installed:
