@@ -41,7 +41,12 @@ To increase an image data set, for one given image I've produced three additiona
 
 This allowed me to add more variety to data set of images and improve road recognition in difficult places like shadows, bikes, sidewalks, road separators.
 
-I am looking into working on city scapes data, still awaiting account approval to download data set. 
+Skip connections are found to improve the segmentation accuracy, as discussed by the authors in the original [paper](./papers/1411.4038.pdf).
+
+I used these resources to learn more about [weight initialization](http://cs231n.github.io/neural-networks-2/#init) and [regularization](http://cs231n.github.io/neural-networks-2/#reg).
+To study more about Semantic Segmentation, I am going to use this resource - [A 2017 Guide to Semantic Segmentation with Deep Learning](http://blog.qure.ai/notes/semantic-segmentation-deep-learning-review).
+
+I am looking into working on [cityscapes data](https://www.cityscapes-dataset.com/), still awaiting account approval to download data set. 
 
 ### Setup
 ##### Frameworks and Packages
@@ -51,7 +56,7 @@ Make sure you have the following is installed:
  - [NumPy](http://www.numpy.org/)
  - [SciPy](https://www.scipy.org/)
 ##### Dataset
-Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the dataset in the `data` folder.  This will create the folder `data_road` with all the training a test images.
+Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the data set in the `data` folder.  This will create the folder `data_road` with all the training a test images.
 
 ### Start
 ##### Implement
