@@ -135,7 +135,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 tests.test_layers(layers)
 
 
-#weights = [0.5, 0.5] #Classes are unbalanced, that is why we can add some weight to the road class.
 # Loss with weights
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     """
@@ -152,6 +151,9 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     cross_entropy_loss = tf.reduce_mean(
         tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
     )
+    reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+    cross_entropy_loss = cross_entropy_loss + sum(reg_losses)
+
     optimizer = tf.train.AdamOptimizer(learning_rate)
     train_op = optimizer.minimize(cross_entropy_loss)
 

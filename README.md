@@ -7,6 +7,8 @@ In this project, you'll label the pixels of a road in images using a Fully Convo
 The function `load_vgg` loads `vgg` model.
 #### Does the project learn the correct features from the images?
 The project has `layers` function implemented.
+This image visualizes the Original Skip Layer Architecture of the network:
+![Original Skip Layer Architecture of the network](./3-Figure3-1.png)
 #### Does the project optimize the neural network?
 The project has `optimize` function implemented.
 #### Does the project train the neural network?
@@ -16,7 +18,7 @@ The project trains model correctly, about 48s per epoch, 48sx20 epochs in total.
 #### Does the project use reasonable hyper parameters?
 I have trained model many times to figure out reasonable set of params.
 I used:
-```bash
+```python
 L2_REG = 1e-5
 STDEV = 1e-2
 KEEP_PROB = 0.8
@@ -31,7 +33,15 @@ Yes, I've tested the project on images from the dataset and here is the result:
 ![KITI data set](./kiti-dataset.gif)
 
 I was tracking the loss during the training and here is a graph that describes my results:
-![Cross-entropy loss](./runs/1519163452.0202436/loss_graph.png)
+![Cross-entropy loss](./loss_graph.png)
+
+#### Reflections
+To improve road recognition I've added image pre processing. In `helper.py` in `def gen_batch_function` I added image crop, image flip and changes to brightness and contrast of the image.
+To increase an image data set, for one given image I've produced three additional once, cropped, flipped and with changed brightness and contrast, for each image I've kept the ground truth to be consistent. If the image was cropped, I've cropped ground truth image as well, if image was flipped, I flip the ground truth images as well.
+
+This allowed me to add more variety to data set of images and improve road recognition in difficult places like shadows, bikes, sidewalks, road separators.
+
+I am looking into working on city scapes data, still awaiting account approval to download data set. 
 
 ### Setup
 ##### Frameworks and Packages
