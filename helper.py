@@ -118,7 +118,7 @@ def process_gt_city_images(gt_image):
     gt_bg = np.all(gt_obj == 0, axis=2)
     gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
 
-    gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+    # gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
 
     return gt_image
 

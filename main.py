@@ -224,8 +224,8 @@ def run():
         input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
         output_layer = layers(layer3, layer4, layer7, NUM_CLASSES_KITI)
 
-        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_KITI))
-        learning_rate = tf.placeholder(dtype=tf.float32)
+        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_KITI), name='correct_label')
+        learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
         logits, train_op, cross_entropy_loss = optimize(output_layer, correct_label, learning_rate, NUM_CLASSES_KITI)
 
@@ -260,8 +260,8 @@ def run_city_data():
         input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
         output = layers(layer3, layer4, layer7, NUM_CLASSES_CITY)
 
-        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_CITY))
-        learning_rate = tf.placeholder(dtype=tf.float32)
+        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_CITY), name='correct_label')
+        learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
 
         logits, train_op, cross_entropy_loss = optimize(output, correct_label, learning_rate, NUM_CLASSES_CITY)
 
