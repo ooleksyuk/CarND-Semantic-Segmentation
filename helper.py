@@ -278,7 +278,7 @@ def gen_test_output_city(sess, logits, keep_prob, image_pl, data_folder, image_s
     :param image_shape: Tuple - Shape of image
     :return: Output for for each test image
     """
-    val_dataset_dir = os.path.join(data_folder, 'gtFine/val/*/')
+    val_dataset_dir = os.path.join(data_folder, 'val_ds/')
 
     for image_file in os.listdir(val_dataset_dir):
         image = scipy.misc.imresize(scipy.misc.imread(os.path.join(val_dataset_dir, image_file)), image_shape)

@@ -23,14 +23,19 @@ L2_REG = 1e-5
 STDEV = 1e-2
 KEEP_PROB = 0.8
 LEARNING_RATE = 1e-4
-EPOCHS = 20
-BATCH_SIZE = 8
-IMAGE_SHAPE = (160, 576)
-NUM_CLASSES = 2
+EPOCHS_KITI = 20
+BATCH_SIZE_KITI = 8
+IMAGE_SHAPE_KITI = (160, 576)
+NUM_CLASSES_KITI = 2
 
 DATA_DIR = './data'
-RUNS_DIR = './runs'
-MODEL_DIR = './models_3col'
+RUNS_DIR_KITI = './runs'
+RUNS_DIR_CITY = './runs_cityscapes'
+
+EPOCHS_CITY = 40
+BATCH_SIZE_CITY = 16
+IMAGE_SHAPE_CITY = (256, 512)
+NUM_CLASSES_CITY = 4
 
 
 def load_vgg(sess, vgg_path):
@@ -194,7 +199,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             # if epoch % 10 == 0:
             #     saver.save(sess, os.path.join(DATA_DIR, 'checkpoints/cont_epoch_' + str(epoch) + '.ckpt'))
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
-    helper.plot_loss(RUNS_DIR, losses, "loss_graph")
+    helper.plot_loss(RUNS_DIR_KITI, losses, "loss_graph")
 
 
 tests.test_train_nn(train_nn)
@@ -217,24 +222,24 @@ def run():
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
-        get_batches_fn = helper.gen_batch_function(os.path.join(DATA_DIR, 'data_road/training'), IMAGE_SHAPE)
+        get_batches_fn = helper.gen_batch_function(os.path.join(DATA_DIR, 'data_road/training'), IMAGE_SHAPE_KITI)
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
         # Add some augmentations, see helper.py
         input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
-        output_layer = layers(layer3, layer4, layer7, NUM_CLASSES)
+        output_layer = layers(layer3, layer4, layer7, NUM_CLASSES_KITI)
 
-        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES))
+        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_KITI))
         learning_rate = tf.placeholder(dtype=tf.float32)
 
-        logits, train_op, cross_entropy_loss = optimize(output_layer, correct_label, learning_rate, NUM_CLASSES)
+        logits, train_op, cross_entropy_loss = optimize(output_layer, correct_label, learning_rate, NUM_CLASSES_KITI)
 
         sess.run(tf.global_variables_initializer())
 
-        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
+        train_nn(sess, EPOCHS_KITI, BATCH_SIZE_KITI, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
+        helper.save_inference_samples(RUNS_DIR_KITI, DATA_DIR, sess, IMAGE_SHAPE_KITI, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
 
@@ -253,24 +258,24 @@ def run_city_data():
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
-        get_batches_fn = helper.gen_batch_function_city(os.path.join(DATA_DIR, 'leftImg8bit'), IMAGE_SHAPE)
+        get_batches_fn = helper.gen_batch_function_city(os.path.join(DATA_DIR, 'leftImg8bit'), IMAGE_SHAPE_CITY)
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
         # Add some augmentations, see helper.py
         input_image, keep_prob, layer3, layer4, layer7 = load_vgg(sess, vgg_path)
-        output = layers(layer3, layer4, layer7, NUM_CLASSES)
+        output = layers(layer3, layer4, layer7, NUM_CLASSES_CITY)
 
-        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES))
+        correct_label = tf.placeholder(dtype=tf.float32, shape=(None, None, None, NUM_CLASSES_CITY))
         learning_rate = tf.placeholder(dtype=tf.float32)
 
-        logits, train_op, cross_entropy_loss = optimize(output, correct_label, learning_rate, NUM_CLASSES)
+        logits, train_op, cross_entropy_loss = optimize(output, correct_label, learning_rate, NUM_CLASSES_CITY)
 
         sess.run(tf.global_variables_initializer())
 
-        train_nn(sess, EPOCHS, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
+        train_nn(sess, EPOCHS_CITY, BATCH_SIZE_CITY, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE, logits, keep_prob, input_image)
+        helper.save_inference_samples(RUNS_DIR_CITY, DATA_DIR, sess, IMAGE_SHAPE_CITY, logits, keep_prob, input_image)
 
 
 if __name__ == '__main__':
