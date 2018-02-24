@@ -152,13 +152,7 @@ def gen_batch_function_city(data_folder, image_shape):
                 gt_image = scipy.misc.imread(gt_image_file)
                 image2, gt_image2 = flip_image(image, gt_image)
 
-                # gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
-                # image = cv2.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
-
                 # image, gt_image = crop_image(image, gt_image)  # Random crop augmentation
-
-                # image = cv2.resize(image, image_shape)
-                # gt_image = cv2.resize(gt_image, image_shape)
 
                 image = scipy.misc.imresize(image, image_shape)
                 gt_image = scipy.misc.imresize(gt_image, image_shape)

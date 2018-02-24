@@ -29,8 +29,7 @@ IMAGE_SHAPE_KITI = (160, 576)
 NUM_CLASSES_KITI = 2
 
 DATA_DIR = './data'
-RUNS_DIR_KITI = './runs'
-RUNS_DIR_CITY = './runs_cityscapes'
+RUNS_DIR = './runs'
 
 EPOCHS_CITY = 40
 BATCH_SIZE_CITY = 16
@@ -153,9 +152,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
 
-    cross_entropy_loss = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
-    )
+    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))
     reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
     cross_entropy_loss = cross_entropy_loss + sum(reg_losses)
 
@@ -196,10 +193,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                            learning_rate: LEARNING_RATE}
             )
             losses.append(loss)
-            # if epoch % 10 == 0:
-            #     saver.save(sess, os.path.join(DATA_DIR, 'checkpoints/cont_epoch_' + str(epoch) + '.ckpt'))
         print("[Epoch: {0}/{1} Loss: {2:4f} Time: {3}]".format(epoch + 1, epochs, loss, str(timedelta(seconds=(time.time() - s_time)))))
-    helper.plot_loss(RUNS_DIR_KITI, losses, "loss_graph")
+    helper.plot_loss(RUNS_DIR, losses, "loss_graph")
 
 
 tests.test_train_nn(train_nn)
@@ -239,7 +234,7 @@ def run():
         train_nn(sess, EPOCHS_KITI, BATCH_SIZE_KITI, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR_KITI, DATA_DIR, sess, IMAGE_SHAPE_KITI, logits, keep_prob, input_image)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE_KITI, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
 
@@ -275,7 +270,7 @@ def run_city_data():
         train_nn(sess, EPOCHS_CITY, BATCH_SIZE_CITY, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(RUNS_DIR_CITY, DATA_DIR, sess, IMAGE_SHAPE_CITY, logits, keep_prob, input_image)
+        helper.save_inference_samples(RUNS_DIR, DATA_DIR, sess, IMAGE_SHAPE_CITY, logits, keep_prob, input_image)
 
 
 if __name__ == '__main__':
