@@ -106,25 +106,17 @@ def process_gt_city_images(gt_image):
     sign_color = np.array([220, 220, 0, 255])
 
     gt_road = np.all(gt_image == road_color, axis=2)
-    gt_road_w = gt_road.shape[0]
-    gt_road_h = gt_road.shape[1]
-    gt_road = gt_road.reshape(gt_road_w, gt_road_h, 1)
+    gt_road = gt_road.reshape(gt_road.shape[0], gt_road.shape[1], 1)
 
     gt_car = np.all(gt_image == car_color, axis=2)
-    gt_car_w = gt_car.shape[0]
-    gt_car_h = gt_car.shape[1]
-    gt_car = gt_car.reshape(gt_car_w, gt_car_h, 1)
+    gt_car = gt_car.reshape(gt_car.shape[0], gt_car.shape[1], 1)
 
     gt_sing = np.all(gt_image == sign_color, axis=2)
-    gt_sing_w = gt_sing.shape[0]
-    gt_sing_h = gt_sing.shape[1]
-    gt_sing = gt_sing.reshape(gt_sing_w, gt_sing_h, 1)
+    gt_sing = gt_sing.reshape(gt_sing.shape[0], gt_sing.shape[1], 1)
 
     gt_obj = np.concatenate((gt_road, gt_car, gt_sing), axis=2)
     gt_bg = np.all(gt_obj == 0, axis=2)
-    gt_bg_w = gt_bg.shape[0]
-    gt_bg_h = gt_bg.shape[1]
-    gt_bg = gt_bg.reshape(gt_bg_w, gt_bg_h, 1)
+    gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
 
     gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
 
@@ -145,8 +137,8 @@ def gen_batch_function_city(data_folder, image_shape):
         :param batch_size: Batch Size
         :return: Batches of training data
         """
-        train_dataset_dir = os.path.join(data_folder, 'leftImg8bit/train_ds/')
-        gt_dataset_dir = os.path.join(data_folder, 'leftImg8bit/gt_ds/')
+        train_dataset_dir = os.path.join(data_folder, 'train_ds/')
+        gt_dataset_dir = os.path.join(data_folder, 'gt_ds/')
 
         image_paths = os.listdir(gt_dataset_dir)
         random.shuffle(image_paths)
@@ -156,14 +148,14 @@ def gen_batch_function_city(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image_file = os.path.join(gt_dataset_dir, image_file)
 
-                image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
+                image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file))
                 gt_image = scipy.misc.imread(gt_image_file)
                 image2, gt_image2 = flip_image(image, gt_image)
 
                 # gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
                 # image = cv2.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
 
-                image, gt_image = crop_image(image, gt_image)  # Random crop augmentation
+                # image, gt_image = crop_image(image, gt_image)  # Random crop augmentation
 
                 # image = cv2.resize(image, image_shape)
                 # gt_image = cv2.resize(gt_image, image_shape)
@@ -179,6 +171,7 @@ def gen_batch_function_city(data_folder, image_shape):
                 image = bc_img(image, contr, bright)
 
                 gt_image = process_gt_city_images(gt_image)
+                gt_image2 = process_gt_city_images(gt_image2)
 
                 images.append(image)
                 gt_images.append(gt_image)

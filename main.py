@@ -210,10 +210,10 @@ def run():
     # https://www.cityscapes-dataset.com/
 
     print("Start training...")
-    config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = 0.4
+    # config = tf.ConfigProto()
+    # config.gpu_options.per_process_gpu_memory_fraction = 0.4
     tf.reset_default_graph()
-    with tf.Session(config=config) as sess:
+    with tf.Session() as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
@@ -247,8 +247,9 @@ def run_city_data():
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
     print("Start training...")
-    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5))
-    with tf.Session(config=config) as sess:
+    # config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5))
+    tf.reset_default_graph()
+    with tf.Session() as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
