@@ -77,7 +77,7 @@ def crop_image(image, gt_image):
 
 
 def flip_image(image, gt_image):
-    return np.flipud(image), np.flipud(gt_image)
+    return np.flip(image, axis=1), np.flip(gt_image, axis=1)
 
 
 def bc_img(img, s=1.0, m=0.0):
@@ -146,7 +146,6 @@ def gen_batch_function_city(data_folder, image_shape):
         :return: Batches of training data
         """
         train_dataset_dir = os.path.join(data_folder, 'leftImg8bit/train_ds/')
-        # val_dataset_dir = os.path.join(data_folder, 'leftImg8bit/val_ds/')
         gt_dataset_dir = os.path.join(data_folder, 'leftImg8bit/gt_ds/')
 
         image_paths = os.listdir(gt_dataset_dir)
@@ -159,6 +158,7 @@ def gen_batch_function_city(data_folder, image_shape):
 
                 image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
                 gt_image = scipy.misc.imread(gt_image_file)
+                image2, gt_image2 = flip_image(image, gt_image)
 
                 # gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
                 # image = cv2.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
@@ -171,6 +171,9 @@ def gen_batch_function_city(data_folder, image_shape):
                 image = scipy.misc.imresize(image, image_shape)
                 gt_image = scipy.misc.imresize(gt_image, image_shape)
 
+                image2 = scipy.misc.imresize(image2, image_shape)
+                gt_image2 = scipy.misc.imresize(gt_image2, image_shape)
+
                 contr = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-40, 30)  # Brightness augmentation
                 image = bc_img(image, contr, bright)
@@ -179,6 +182,9 @@ def gen_batch_function_city(data_folder, image_shape):
 
                 images.append(image)
                 gt_images.append(gt_image)
+
+                images.append(image2)
+                gt_images.append(gt_image2)
 
             yield np.array(images), np.array(gt_images)
 
@@ -279,7 +285,7 @@ def gen_test_output_city(sess, logits, keep_prob, image_pl, data_folder, image_s
     :param image_shape: Tuple - Shape of image
     :return: Output for for each test image
     """
-    val_dataset_dir = os.path.join(data_folder, 'leftImg8bit/val_ds/')
+    val_dataset_dir = os.path.join(data_folder, 'gtFine/val/*/')
 
     for image_file in os.listdir(val_dataset_dir):
         image = scipy.misc.imresize(scipy.misc.imread(os.path.join(val_dataset_dir, image_file)), image_shape)
