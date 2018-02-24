@@ -213,7 +213,8 @@ def run():
     # config = tf.ConfigProto()
     # config.gpu_options.per_process_gpu_memory_fraction = 0.4
     tf.reset_default_graph()
-    with tf.Session() as sess:
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5))
+    with tf.Session(config=config) as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
@@ -249,7 +250,8 @@ def run_city_data():
     print("Start training...")
     # config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5))
     tf.reset_default_graph()
-    with tf.Session() as sess:
+    config = tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.5))
+    with tf.Session(config=config) as sess:
         # Path to vgg model
         vgg_path = os.path.join(DATA_DIR, 'vgg')
         # Create function to get batches
