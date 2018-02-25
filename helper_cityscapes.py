@@ -132,11 +132,11 @@ def gen_batch_function(data_folder, image_shape):
                 # image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
                 image = cv2.resize(image, image_shape)
                 gt_image = cv2.resize(gt_image, image_shape)
-                contr = random.uniform(0.85, 1.15)  # Contrast augmentation
-                bright = random.randint(-40, 30)  # Brightness augmentation
-                image = bc_img(image, contr, bright)
-                print("gt_image after bc_image")
-                print(gt_image)
+                # contr = random.uniform(0.85, 1.15)  # Contrast augmentation
+                # bright = random.randint(-40, 30)  # Brightness augmentation
+                # image = bc_img(image, contr, bright)
+                # print("gt_image after bc_image")
+                # print(gt_image)
                 print("gt_image.shape after bc_image")
                 print(gt_image.shape)
                 print("road_color")
