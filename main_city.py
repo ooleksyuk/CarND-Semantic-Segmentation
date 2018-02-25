@@ -140,8 +140,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     for epoch in range(epochs):
         s_time = time.time()
         for image, targets in get_batches_fn(batch_size):
+            print(targets.shape)
+            print(image.shape)
             _, loss = sess.run([train_op, cross_entropy_loss],
-                               feed_dict={input_image: image, correct_label: targets, keep_prob: KEEP_PROB,
+                               feed_dict={input_image: image,
+                                          correct_label: targets,
+                                          keep_prob: KEEP_PROB,
                                           learning_rate: LEARNING_RATE})  # / (epoch/100 + 1)
             print(loss)
         # Print data on the learning process
