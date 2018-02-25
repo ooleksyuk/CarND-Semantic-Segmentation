@@ -105,7 +105,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
     # Loss with weights
-    weights = [0.3, 0.6, 0.3, 0.3]
+    weights = [0.3, 0.6, 0.3]
     # Classes are unbalanced, that is why we can add some weight to the road class.
     # From https://github.com/MarvinTeichmann/KittiSeg
     weights = tf.reshape(weights, (num_classes, -1))
