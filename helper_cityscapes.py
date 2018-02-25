@@ -127,7 +127,7 @@ def gen_batch_function(data_folder, image_shape):
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
                 image = cv2.imread(os.path.join(train_dataset_dir, image_file))
-                print(image.shape)
+                print("gt_image.shape after read")
                 print(gt_image.shape)
                 # image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
                 image = cv2.resize(image, image_shape)
@@ -135,8 +135,11 @@ def gen_batch_function(data_folder, image_shape):
                 contr = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-40, 30)  # Brightness augmentation
                 image = bc_img(image, contr, bright)
+                print("gt_image after bc_image")
                 print(gt_image)
+                print("gt_image.shape after bc_image")
                 print(gt_image.shape)
+                print("road_color")
                 print(road_color)
                 gt_road = np.all(gt_image == road_color, axis=2)
                 gt_road = gt_road.reshape(*gt_road.shape, 1)
