@@ -125,13 +125,13 @@ def gen_batch_function(data_folder, image_shape):
             gt_images = []
             print(image_paths)
             for image_file in image_paths[batch_i:batch_i + batch_size]:
-                gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
-                image = cv2.imread(os.path.join(train_dataset_dir, image_file))
+                gt_image = scipy.misc.imread(os.path.join(gt_dataset_dir, image_file))
+                image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file))
                 print("gt_image.shape after read")
                 print(gt_image.shape)
                 # image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
-                image = cv2.resize(image, image_shape)
-                gt_image = cv2.resize(gt_image, image_shape)
+                image = scipy.misc.imresize(image, image_shape)
+                gt_image = scipy.misc.imresize(gt_image, image_shape)
                 # contr = random.uniform(0.85, 1.15)  # Contrast augmentation
                 # bright = random.randint(-40, 30)  # Brightness augmentation
                 # image = bc_img(image, contr, bright)
