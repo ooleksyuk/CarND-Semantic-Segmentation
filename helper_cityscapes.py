@@ -135,6 +135,9 @@ def gen_batch_function(data_folder, image_shape):
                 contr = random.uniform(0.85, 1.15)  # Contrast augmentation
                 bright = random.randint(-40, 30)  # Brightness augmentation
                 image = bc_img(image, contr, bright)
+                print(gt_image)
+                print(gt_image.shape)
+                print(road_color)
                 gt_road = np.all(gt_image == road_color, axis=2)
                 gt_road = gt_road.reshape(*gt_road.shape, 1)
                 gt_car = np.all(gt_image == car_color, axis=2)
