@@ -98,7 +98,7 @@ def load_data():
     image_paths = os.listdir(gt_dataset_dir)
     for image_file in image_paths:
         gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
-        image = cv2.imread(os.path.join(train_dataset_dir, image_file[:-5] + '.png'))
+        image = cv2.imread(os.path.join(train_dataset_dir, image_file))
         gt_input.append(gt_image)
         img_input.append(image)
 
@@ -123,6 +123,7 @@ def gen_batch_function(data_folder, image_shape):
         for batch_i in range(0, len(image_paths), batch_size):
             images = []
             gt_images = []
+            print(image_paths)
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image = cv2.imread(os.path.join(gt_dataset_dir, image_file))
                 image = cv2.imread(os.path.join(train_dataset_dir, image_file))
