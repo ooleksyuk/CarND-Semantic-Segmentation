@@ -146,8 +146,8 @@ def gen_batch_function(data_folder, image_shape):
                 gt_car = np.all(gt_image == car_color, axis=2)
                 gt_car = gt_car.reshape(*gt_car.shape, 1)
                 gt_obj = np.concatenate((gt_road, gt_car), axis=2)
-                # gt_bg = np.all(gt_obj == 0, axis=2)
-                # gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+                gt_bg = np.all(gt_obj == 0, axis=2)
+                gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
                 images.append(image)
                 gt_images.append(gt_image)
             yield np.array(images), np.array(gt_images)
@@ -190,9 +190,9 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape,
         mask = scipy.misc.toimage(mask, mode="RGBA")
         street_im.paste(mask, box=None, mask=mask)
         # Signs
-        # im_softmax_r = im_softmax[0][:, 3].reshape(image_shape[0], image_shape[1])
-        # segmentation_r = (im_softmax_r > 0.5).reshape(image_shape[0], image_shape[1], 1)
-        # mask += np.dot(segmentation_r, np.array([[220, 220, 0, 127]]))
+        im_softmax_r = im_softmax[0][:, 3].reshape(image_shape[0], image_shape[1])
+        segmentation_r = (im_softmax_r > 0.5).reshape(image_shape[0], image_shape[1], 1)
+        mask += np.dot(segmentation_r, np.array([[220, 220, 0, 127]]))
 
         yield os.path.basename(image_file), np.array(street_im)
 
