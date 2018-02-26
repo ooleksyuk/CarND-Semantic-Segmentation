@@ -98,12 +98,12 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
 def build_predictor(nn_last_layer):
     softmax_output = tf.nn.softmax(nn_last_layer)
-    predictions_argmax = tf.argmax(softmax_output, axis=-1, output_type=tf.int64)
+    predictions_argmax = tf.argmax(softmax_output, axis=-1) #, output_type=tf.int64)
     return softmax_output, predictions_argmax
 
 
 def build_metrics(correct_label, predictions_argmax, num_classes):
-    labels_argmax = tf.argmax(correct_label, axis=-1, output_type=tf.int64)
+    labels_argmax = tf.argmax(correct_label, axis=-1) #, output_type=tf.int64)
     iou, iou_op = tf.metrics.mean_iou(labels_argmax, predictions_argmax, num_classes)
     return iou, iou_op
 
