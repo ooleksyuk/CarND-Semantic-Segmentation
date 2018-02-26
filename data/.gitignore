@@ -3,6 +3,8 @@ vgg/
 gtFine_trainvaltest/
 leftImg8bit_demoVideo/
 leftImg8bit_trainvaltest/
+gtFine/
+leftImg8bit/
 
 vgg16.npy
 
