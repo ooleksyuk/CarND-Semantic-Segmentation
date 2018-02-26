@@ -152,54 +152,20 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
 
-    # cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels), name='loss')
-    # weights = tf.constant([0.3, 0.3, 0.3, 0.6], name="weights")
-    # cross_entropy_loss = tf.reduce_mean(
-    #     tf.losses.softmax_cross_entropy(
-    #         logits=logits,
-    #         onehot_labels=labels,
-    #         weights=weights,
-    #         loss_collection=tf.GraphKeys.LOSSES
-    #     ), name='cross_entropy_loss')
-    # reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-    # cross_entropy_loss = cross_entropy_loss + sum(reg_losses)
-    #
-    # train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
+    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))
 
-    logits = tf.reshape(nn_last_layer, [-1, num_classes])
-    labels = tf.reshape(correct_label, [-1, num_classes])
-    l2_const = 0.002
-    with tf.name_scope("xent"):
-        cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=labels, logits=logits))
-        tf.summary.scalar("xent", cross_entropy_loss)
+    # # l2_reg does not help here apparently  ...
+    # regularization_loss = tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)) # Scalar
+    # cross_entropy_loss = cross_entropy_loss + regularization_loss
 
-    with tf.name_scope("train"):
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate, beta1=0.9, beta2=0.999, epsilon=1e-08,
-                                           use_locking=False, name='Adam')
+    optimizer = tf.train.AdamOptimizer(learning_rate)
+    # optimizer = tf.train.MomentumOptimizer(learning_rate, momentum=0.99)
+    # optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    # optimizer = tf.train.RMSPropOptimizer(learning_rate, decay=0.9, momentum=0.0)
 
-    reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-    cross_entropy_loss = cross_entropy_loss + l2_const * sum(reg_losses)
-
-    train_op = optimizer.minimize(loss=cross_entropy_loss)
+    train_op = optimizer.minimize(cross_entropy_loss)
 
     return logits, train_op, cross_entropy_loss
-    # weights = tf.reshape([0.3, 0.3, 0.3, 0.6], (num_classes- 1), name='weights')
-    # logits = tf.reshape(nn_last_layer, (-1, num_classes), name='logits')
-    # labels = tf.reshape(correct_label, (-1, num_classes), name='labels')
-    #
-    # softmax = tf.nn.softmax(logits)
-    #
-    # labels = labels * tf.log(softmax)
-    # print("labels")
-    # print(labels)
-    # print("weights")
-    # print(weights)
-    # cross_entropy = -tf.reduce_sum(tf.matmul(labels, weights), reduction_indices=[1], name='cross_entropy')
-    # cross_entropy_loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
-    #
-    # train_op = tf.train.RMSPropOptimizer(learning_rate).minimize(cross_entropy_loss)
-    #
-    # return logits, train_op, cross_entropy_loss
 
 tests.test_optimize(optimize)
 
