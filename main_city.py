@@ -137,8 +137,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 
 
 def train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_fn, train_op, cross_entropy_loss,
-             input_image,
-             correct_label, keep_prob, learning_rate, iou, iou_op, saver, n_train, n_valid, lr, early_stop, patience):
+             input_image, correct_label, keep_prob, learning_rate, iou, iou_op, saver, n_train, n_valid, lr,
+             early_stop, patience):
     """
     Train neural network and print out the loss during training.
     :param sess: TF Session
@@ -225,10 +225,10 @@ def predict_nn(sess, test_image, predictions_argmax, input_image, keep_prob, ima
     labels = labels[0].reshape(image_shape[0], image_shape[1])
 
     # create an overlay
-    labels_colored = np.zeros((*image_shape, 4))  # 4 for RGBA
+    labels_colored = np.zeros((image_shape[0], image_shape[1], 4))  # 4 for RGBA
     for label in label_colors:
         label_mask = labels == label
-        labels_colored[label_mask] = np.array((*label_colors[label], 127))
+        labels_colored[label_mask] = np.array((label_colors[label].shape[0], label_colors[label].shape[1], 127))
 
     mask = scipy.misc.toimage(labels_colored, mode="RGBA")
     pred_image = scipy.misc.toimage(image)
@@ -268,7 +268,7 @@ def run():
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
     runs_dir = './city_runs'
-    city_data_dir = './data/cityscapes'
+    city_data_dir = './data'
     train_images, valid_images, test_images, num_classes, label_colors, image_shape = helper_cityscapes.load_data(
         city_data_dir)
     print("len: train_images {}, valid_images {}, test_images {}".format(len(train_images), len(valid_images),
@@ -316,10 +316,10 @@ def run():
 
         n_train = int(math.ceil(len(train_images) / batch_size))
         n_valid = int(math.ceil(len(valid_images) / batch_size))
-        train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_fn, train_op, cross_entropy_loss,
-                 input_image,
-                 correct_label, keep_prob, learning_rate, iou, iou_op, saver, n_train, n_valid, lr, early_stop,
-                 patience)
+        train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_fn,
+                 train_op, cross_entropy_loss, input_image,
+                 correct_label, keep_prob, learning_rate, iou, iou_op, saver,
+                 n_train, n_valid, lr, early_stop, patience)
 
         test_image = scipy.misc.imread("test_image.png")
         pred_image = predict_nn(sess, test_image, predictions_argmax, input_image, keep_prob, image_shape, label_colors)
@@ -327,8 +327,8 @@ def run():
 
         n_batches = int(math.ceil(len(test_images) / batch_size))
         # batch_size 32 is ok (and faster) with GTX 1080 TI and 11 GB memory
-        test_nn(sess, 32, get_test_batches_fn, predictions_argmax, input_image, correct_label, keep_prob, iou, iou_op,
-                n_batches)
+        test_nn(sess, 32, get_test_batches_fn, predictions_argmax, input_image,
+                correct_label, keep_prob, iou, iou_op, n_batches)
 
         saver.restore(sess, tf.train.latest_checkpoint('.'))
 

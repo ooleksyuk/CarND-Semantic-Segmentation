@@ -10,7 +10,7 @@ from glob import glob
 
 from collections import namedtuple
 from timeit import default_timer as timer
-
+# scp -i ~/.ssh/carnd.pem ~/mv_udacity/term3/CarND-Semantic-Segmentation/data/gtFine  ec2-54-91-71-69.compute-1.amazonaws.com:~/CarND-Semantic-Segmentation/data
 #-------------------------------------------------------------------------------
 # Data
 #-------------------------------------------------------------------------------
@@ -136,6 +136,8 @@ def gen_batch_function(image_paths, image_shape):
                 label_bg = ~label_bg
                 label_all = np.dstack([label_bg, *label_list])
                 label_all = label_all.astype(np.float32)
+                print("img.shape :{0}, image_file: {1}".format(image.shape, image_file))
+                print("label.shape:{0}, gt_image: {1}".format(label_all.shape, gt_image_file))
 
                 images.append(image)
                 labels.append(label_all)
@@ -163,12 +165,12 @@ def gen_test_output(sess, logits, keep_prob, image_pl, image_files, image_shape,
         gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
 
         # labels: flat list and not 2D shape of floats
-        #start = timer()
+        start = timer()
         labels = sess.run(
             [tf.argmax(tf.nn.softmax(logits), axis=-1)],
             {keep_prob: 1.0, image_pl: [image]})
-        #end = timer()
-        #print("  inference time {} ...".format(end-start))
+        end = timer()
+        print("  inference time {} ...".format(end-start))
 
         labels = labels[0].reshape(image_shape[0], image_shape[1])
         labels_colored = np.zeros_like(gt_image)
