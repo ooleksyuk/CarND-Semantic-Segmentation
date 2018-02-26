@@ -93,9 +93,8 @@ def process_gt_image(gt_image):
     background_color = np.array([255, 0, 0])
 
     gt_bg = np.all(gt_image == background_color, axis=2)
-    w = gt_bg.shape[0]
-    h = gt_bg.shape[1]
-    gt_bg = gt_bg.reshape(w, h, 1)
+    gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
+
     gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
     return gt_image
 
@@ -115,10 +114,11 @@ def process_gt_city_images(gt_image):
     gt_sing = gt_sing.reshape(gt_sing.shape[0], gt_sing.shape[1], 1)
 
     gt_obj = np.concatenate((gt_road, gt_car, gt_sing), axis=2)
+
     gt_bg = np.all(gt_obj == 0, axis=2)
     gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
 
-    # gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+    gt_image = np.concatenate((gt_bg, gt_obj), axis=2)
 
     return gt_image
 
@@ -137,8 +137,8 @@ def gen_batch_function_city(data_folder, image_shape):
         :param batch_size: Batch Size
         :return: Batches of training data
         """
-        train_dataset_dir = os.path.join(data_folder, 'train_ds/')
-        gt_dataset_dir = os.path.join(data_folder, 'gt_ds/')
+        train_dataset_dir = os.path.join(data_folder, 'leftImg8bit/train_ds/')
+        gt_dataset_dir = os.path.join(data_folder, 'leftImg8bit/gt_ds/')
 
         image_paths = os.listdir(gt_dataset_dir)
         random.shuffle(image_paths)
@@ -149,10 +149,10 @@ def gen_batch_function_city(data_folder, image_shape):
                 gt_image_file = os.path.join(gt_dataset_dir, image_file)
 
                 image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file))
+                # image, gt_image = crop_image(image, gt_image)  # Random crop augmentation
+
                 gt_image = scipy.misc.imread(gt_image_file)
                 image2, gt_image2 = flip_image(image, gt_image)
-
-                # image, gt_image = crop_image(image, gt_image)  # Random crop augmentation
 
                 image = scipy.misc.imresize(image, image_shape)
                 gt_image = scipy.misc.imresize(gt_image, image_shape)
@@ -272,10 +272,10 @@ def gen_test_output_city(sess, logits, keep_prob, image_pl, data_folder, image_s
     :param image_shape: Tuple - Shape of image
     :return: Output for for each test image
     """
-    val_dataset_dir = os.path.join(data_folder, 'val_ds/')
 
-    for image_file in os.listdir(val_dataset_dir):
-        image = scipy.misc.imresize(scipy.misc.imread(os.path.join(val_dataset_dir, image_file)), image_shape)
+    for image_file in glob(os.path.join(data_folder, 'image_2', '*.png')):
+        image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
+
         street_im = scipy.misc.toimage(image)
         im_soft_max = sess.run([tf.nn.softmax(logits)], {keep_prob: 1.0, image_pl: [image]})
 

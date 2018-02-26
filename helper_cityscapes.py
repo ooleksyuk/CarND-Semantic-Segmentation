@@ -123,33 +123,37 @@ def gen_batch_function(data_folder, image_shape):
         for batch_i in range(0, len(image_paths), batch_size):
             images = []
             gt_images = []
-            print(image_paths)
             for image_file in image_paths[batch_i:batch_i + batch_size]:
                 gt_image = scipy.misc.imread(os.path.join(gt_dataset_dir, image_file))
+
                 image = scipy.misc.imread(os.path.join(train_dataset_dir, image_file))
-                print("gt_image.shape after read")
-                print(gt_image.shape)
                 # image, gt_image = random_crop(image, gt_image)  # Random crop augmentation
+
                 image = scipy.misc.imresize(image, image_shape)
                 gt_image = scipy.misc.imresize(gt_image, image_shape)
+
                 # contr = random.uniform(0.85, 1.15)  # Contrast augmentation
                 # bright = random.randint(-40, 30)  # Brightness augmentation
                 # image = bc_img(image, contr, bright)
-                # print("gt_image after bc_image")
-                # print(gt_image)
-                print("gt_image.shape after bc_image")
-                print(gt_image.shape)
-                print("road_color")
-                print(road_color)
+
                 gt_road = np.all(gt_image == road_color, axis=2)
-                gt_road = gt_road.reshape(*gt_road.shape, 1)
+                gt_road = gt_road.reshape(gt_road.shape[0], gt_road.shape[1], 1)
+
                 gt_car = np.all(gt_image == car_color, axis=2)
-                gt_car = gt_car.reshape(*gt_car.shape, 1)
+                gt_car = gt_car.reshape(gt_car.shape[0], gt_car.shape[1], 1)
+
                 gt_obj = np.concatenate((gt_road, gt_car), axis=2)
                 gt_bg = np.all(gt_obj == 0, axis=2)
-                gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+
+                gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
+
+                gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+                print("gt_image")
+                print(gt_image)
+
                 images.append(image)
                 gt_images.append(gt_image)
+
             yield np.array(images), np.array(gt_images)
 
     return get_batches_fn

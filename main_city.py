@@ -24,7 +24,7 @@ STDEV = 1e-3
 KEEP_PROB = 0.5
 LEARNING_RATE = 1e-4
 EPOCHS = 30
-BATCH_SIZE = 16
+BATCH_SIZE = 1
 IMAGE_SHAPE = (256, 512)
 NUM_CLASSES = 3
 
@@ -118,7 +118,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     return logits, train_op, cross_entropy_loss
 
 print("Optimize Test:")
-#tests.test_optimize(optimize)
+# tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
