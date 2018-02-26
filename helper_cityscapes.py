@@ -10,15 +10,7 @@ from glob import glob
 
 from collections import namedtuple
 from timeit import default_timer as timer
-# scp -i ~/.ssh/carnd.pem ~/mv_udacity/term3/CarND-Semantic-Segmentation/data/gtFine  ec2-54-91-71-69.compute-1.amazonaws.com:~/CarND-Semantic-Segmentation/data
-#-------------------------------------------------------------------------------
-# Data
-#-------------------------------------------------------------------------------
 
-
-#-------------------------------------------------------------------------------
-# Labels
-#-------------------------------------------------------------------------------
 Label = namedtuple('Label', ['name', 'color'])
 
 # in case you would use cv2
@@ -64,16 +56,16 @@ label_defs = [
 
 def build_file_list(images_root, labels_root, sample_name):
     image_sample_root = images_root + '/' + sample_name
-    image_root_len    = len(image_sample_root)
+    image_root_len = len(image_sample_root)
     label_sample_root = labels_root + '/' + sample_name
-    image_files       = glob(image_sample_root + '/**/*png')
-    file_list         = []
+    image_files = glob(image_sample_root + '/**/*png')
+    file_list = []
     for f in image_files:
-        f_relative      = f[image_root_len:]
-        f_dir           = os.path.dirname(f_relative)
-        f_base          = os.path.basename(f_relative)
+        f_relative = f[image_root_len:]
+        f_dir = os.path.dirname(f_relative)
+        f_base = os.path.basename(f_relative)
         f_base_gt = f_base.replace('leftImg8bit', 'gtFine_color')
-        f_label   = label_sample_root + f_dir + '/' + f_base_gt
+        f_label = label_sample_root + f_dir + '/' + f_base_gt
         if os.path.exists(f_label):
             file_list.append((f, f_label))
     return file_list
@@ -92,11 +84,6 @@ def load_data(data_folder):
 
     return train_images, valid_images, test_images, num_classes, label_colors, image_shape
 
-    #num_images = len(image_paths)
-    #random.shuffle(image_paths)
-    #valid_images = image_paths[:(int)(valid_frac*num_images)]
-    #train_images = image_paths[(int)(valid_frac*num_images):]
-    #return train_images, valid_images, label_paths
 
 def gen_batch_function(image_paths, image_shape):
     """
@@ -111,7 +98,6 @@ def gen_batch_function(image_paths, image_shape):
         :param batch_size: Batch Size
         :return: Batches of training data
         """
-        #background_color = np.array([255, 0, 0])
         random.shuffle(image_paths)
         for batch_i in range(0, len(image_paths), batch_size):
             image_files = image_paths[batch_i:batch_i+batch_size]
@@ -136,8 +122,6 @@ def gen_batch_function(image_paths, image_shape):
                 label_bg = ~label_bg
                 label_all = np.dstack([label_bg, *label_list])
                 label_all = label_all.astype(np.float32)
-                # print("img.shape :{0}, image_file: {1}".format(image.shape, image_file))
-                # print("label.shape:{0}, gt_image: {1}".format(label_all.shape, gt_image_file))
 
                 images.append(image)
                 labels.append(label_all)
@@ -194,19 +178,6 @@ def save_inference_samples(runs_dir, image_files, sess, image_shape, logits, kee
 
     # Run NN on test images and save them to HD
     print('Training Finished. Saving test images to: {}'.format(output_dir))
-    image_outputs = gen_test_output(
-        sess, logits, keep_prob, input_image, image_files, image_shape, label_colors)
+    image_outputs = gen_test_output(sess, logits, keep_prob, input_image, image_files, image_shape, label_colors)
     for name, image in image_outputs:
         scipy.misc.imsave(os.path.join(output_dir, name), image)
-
-
-
-
-#train_images, valid_images, test_images, num_classes, label_colors, image_shape = load_data('./data/cityscapes')
-#train_generator = gen_batch_function(train_images, image_shape)
-#valid_generator = gen_batch_function(valid_images, image_shape)
-#test_generator = gen_batch_function(test_images, image_shape)
-#print("len: train_images {}, valid_images {}, test_images {}".format(len(train_images), len(valid_images), len(test_images)))
-#print("num_classes {}, image_shape {}".format(num_classes, image_shape))
-#print("label_colors: {}".format(label_colors))
-##print("valid_images: {}".format(valid_images))

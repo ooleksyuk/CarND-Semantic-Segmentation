@@ -15,8 +15,7 @@ import numpy as np
 import argparse
 
 # Check TensorFlow Version
-assert LooseVersion(tf.__version__) >= LooseVersion(
-    '1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
+assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
 print('TensorFlow Version: {}'.format(tf.__version__))
 
 # Check for a GPU
@@ -24,6 +23,22 @@ if not tf.test.gpu_device_name():
     warnings.warn('No GPU found. Please use a GPU to train your neural network.')
 else:
     print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+L2_REG = 1e-5
+STDEV = 1e-2
+KEEP_PROB = 0.8
+LEARNING_RATE = 1e-4
+EPOCHS_KITI = 20
+BATCH_SIZE_KITI = 8
+IMAGE_SHAPE_KITI = (160, 576)
+NUM_CLASSES_KITI = 2
+
+DATA_DIR = './data'
+RUNS_DIR = './runs'
+
+EPOCHS_CITY = 40
+BATCH_SIZE_CITY = 8
+IMAGE_SHAPE_CITY = (256, 512)
+NUM_CLASSES_CITY = 4
 
 
 def load_vgg(sess, vgg_path):
@@ -62,34 +77,76 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :param num_classes: Number of classes to classify
     :return: The Tensor for the last layer of output
     """
-    init = tf.truncated_normal_initializer(stddev=0.001)
-    reg = tf.contrib.layers.l2_regularizer(1e-3)
+    init = tf.truncated_normal_initializer(stddev=STDEV)
+    reg = tf.contrib.layers.l2_regularizer(L2_REG)
 
     # as per fcn8s reference caffe implementation: but does not help at all ...
     # vgg_layer3_out_scaled = tf.multiply(vgg_layer3_out, 0.0001)
     # vgg_layer4_out_scaled = tf.multiply(vgg_layer4_out, 0.01)
 
     # reduce dimensions with conv1x1 filters
-    conv1x1_l3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, 1, padding='same',
-                                  kernel_initializer=init, kernel_regularizer=reg)
-    conv1x1_l4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 1, padding='same',
-                                  kernel_initializer=init, kernel_regularizer=reg)
-    conv1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1, padding='same',
-                               kernel_initializer=init, kernel_regularizer=reg)
+    conv1x1_l3 = tf.layers.conv2d(
+        vgg_layer3_out,
+        num_classes,
+        kernel_size=1,
+        strides=1,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
+    conv1x1_l4 = tf.layers.conv2d(
+        vgg_layer4_out,
+        num_classes,
+        kernel_size=1,
+        strides=1,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
+    conv1x1 = tf.layers.conv2d(
+        vgg_layer7_out,
+        num_classes,
+        kernel_size=1,
+        strides=1,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
 
     # upsample output of encoder by 2
-    deconv_1 = tf.layers.conv2d_transpose(conv1x1, num_classes, 4, 2, padding='same',
-                                          kernel_initializer=init, kernel_regularizer=reg)
+    deconv_1 = tf.layers.conv2d_transpose(
+        conv1x1,
+        num_classes,
+        kernel_size=4,
+        strides=2,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
     # add skip connection from layer 4
     deconv_1 = tf.add(deconv_1, conv1x1_l4)
     # upsample by 2
-    deconv_2 = tf.layers.conv2d_transpose(deconv_1, num_classes, 4, 2, padding='same',
-                                          kernel_initializer=init, kernel_regularizer=reg)
+    deconv_2 = tf.layers.conv2d_transpose(
+        deconv_1,
+        num_classes,
+        kernel_size=4,
+        strides=2,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
     # add skip connection from layer 3
     deconv_2 = tf.add(deconv_2, conv1x1_l3)
     # upsample by 8: so we are back to the original image size (that was downsampled by 32 in encoder)
-    deconv_3 = tf.layers.conv2d_transpose(deconv_2, num_classes, 16, 8, padding='same',
-                                          kernel_initializer=init, kernel_regularizer=reg)
+    deconv_3 = tf.layers.conv2d_transpose(
+        deconv_2,
+        num_classes,
+        kernel_size=16,
+        strides=8,
+        padding='same',
+        kernel_initializer=init,
+        kernel_regularizer=reg
+    )
 
     # tf.Print(deconv_3, [tf.shape](deconv_3)])
 
@@ -228,7 +285,7 @@ def predict_nn(sess, test_image, predictions_argmax, input_image, keep_prob, ima
     labels_colored = np.zeros((image_shape[0], image_shape[1], 4))  # 4 for RGBA
     for label in label_colors:
         label_mask = labels == label
-        labels_colored[label_mask] = np.array((label_colors[label].shape[0], label_colors[label].shape[1], 127))
+        labels_colored[label_mask] = np.array((*label_colors[label], 127))
 
     mask = scipy.misc.toimage(labels_colored, mode="RGBA")
     pred_image = scipy.misc.toimage(image)
@@ -257,22 +314,16 @@ def run():
     early_stop = args.early_stop
     patience = args.patience
 
-    # num_classes = 2
-    # image_shape = (160, 576)
-    data_dir = './data'
-
-    # Download pretrained vgg model
-    helper.maybe_download_pretrained_vgg(data_dir)
+    # Download pre trained vgg model
+    helper.maybe_download_pretrained_vgg(DATA_DIR)
 
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
     runs_dir = './city_runs'
     city_data_dir = './data'
-    train_images, valid_images, test_images, num_classes, label_colors, image_shape = helper_cityscapes.load_data(
-        city_data_dir)
-    print("len: train_images {}, valid_images {}, test_images {}".format(len(train_images), len(valid_images),
-                                                                         len(test_images)))
+    train_images, valid_images, test_images, num_classes, label_colors, image_shape = helper_cityscapes.load_data(city_data_dir)
+    print("len: train_images {}, valid_images {}, test_images {}".format(len(train_images), len(valid_images), len(test_images)))
 
     # Create function to get batches
     get_train_batches_fn = helper_cityscapes.gen_batch_function(train_images, image_shape)
@@ -293,7 +344,7 @@ def run():
 
     with tf.Session() as sess:
         # Path to vgg model
-        vgg_path = os.path.join(data_dir, 'vgg')
+        vgg_path = os.path.join(DATA_DIR, 'vgg')
 
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
