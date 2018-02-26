@@ -137,8 +137,8 @@ def gen_batch_function_city(data_folder, image_shape):
         :param batch_size: Batch Size
         :return: Batches of training data
         """
-        train_dataset_dir = os.path.join(data_folder, 'leftImg8bit/train_ds/')
-        gt_dataset_dir = os.path.join(data_folder, 'leftImg8bit/gt_ds/')
+        train_dataset_dir = os.path.join(data_folder, 'train_ds/')
+        gt_dataset_dir = os.path.join(data_folder, 'gt_ds/')
 
         image_paths = os.listdir(gt_dataset_dir)
         random.shuffle(image_paths)
