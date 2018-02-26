@@ -136,8 +136,8 @@ def gen_batch_function(image_paths, image_shape):
                 label_bg = ~label_bg
                 label_all = np.dstack([label_bg, *label_list])
                 label_all = label_all.astype(np.float32)
-                print("img.shape :{0}, image_file: {1}".format(image.shape, image_file))
-                print("label.shape:{0}, gt_image: {1}".format(label_all.shape, gt_image_file))
+                # print("img.shape :{0}, image_file: {1}".format(image.shape, image_file))
+                # print("label.shape:{0}, gt_image: {1}".format(label_all.shape, gt_image_file))
 
                 images.append(image)
                 labels.append(label_all)
