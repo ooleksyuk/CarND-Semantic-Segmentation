@@ -226,6 +226,7 @@ def train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_f
             losses.append(loss)
             ious.append(sess.run(iou))
         end = timer()
+        helper.plot_loss(RUNS_DIR, losses, "loss_graph_training")
         print("EPOCH {} with lr {} ...".format(epoch + 1, lr))
         print("  time {} ...".format(end - start))
         print("  Train Xentloss = {:.4f}".format(sum(losses) / len(losses)))
@@ -240,6 +241,7 @@ def train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_f
                                feed_dict={input_image: image, correct_label: label, keep_prob: 1})
             losses.append(loss)
             ious.append(sess.run(iou))
+        helper.plot_loss(RUNS_DIR, losses, "loss_graph_validation")
         print("  Valid Xentloss = {:.4f}".format(sum(losses) / len(losses)))
         valid_iou = sum(ious) / len(ious)
         print("  Valid IOU = {:.4f}".format(valid_iou))
@@ -321,7 +323,7 @@ def run():
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
-    runs_dir = './city_runs'
+    runs_dir = './runs_city'
     city_data_dir = './data'
     train_images, valid_images, test_images, num_classes, label_colors, image_shape = helper_cityscapes.load_data(city_data_dir)
     print("len: train_images {}, valid_images {}, test_images {}".format(len(train_images), len(valid_images), len(test_images)))
