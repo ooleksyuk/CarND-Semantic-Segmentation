@@ -246,6 +246,7 @@ def train_nn(sess, epochs, batch_size, get_train_batches_fn, get_valid_batches_f
 
         if (valid_iou > best_iou):
             saver.save(sess, './models/fcn8s')
+            saver.save(sess, './models/fcn8s.ckpt')
             with open("models/training.txt", "w") as text_file:
                 text_file.write("models/fcn8s: epoch {}, lr {}, valid_iou {}".format(epoch + 1, lr, valid_iou))
             print("  model saved")
@@ -382,6 +383,7 @@ def run():
                 correct_label, keep_prob, iou, iou_op, n_batches)
 
         saver.restore(sess, tf.train.latest_checkpoint('.'))
+        print("resume")
 
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper_cityscapes.save_inference_samples(runs_dir, test_images, sess, image_shape, logits, keep_prob,
