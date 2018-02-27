@@ -382,8 +382,9 @@ def run():
         test_nn(sess, 32, get_test_batches_fn, predictions_argmax, input_image,
                 correct_label, keep_prob, iou, iou_op, n_batches)
 
-        saver.restore(sess, tf.train.latest_checkpoint('.'))
-        print("resume")
+        if resume:
+            saver.restore(sess, tf.train.latest_checkpoint('.'))
+            print("resume")
 
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper_cityscapes.save_inference_samples(runs_dir, test_images, sess, image_shape, logits, keep_prob,
