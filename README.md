@@ -39,6 +39,10 @@ BATCH_SIZE = 8
 IMAGE_SHAPE = (256, 512)
 ```
 for CityScapes data set number of classes defined based on a list of classes provided by the set provider.
+Cityscapes test image vs predicted result after `20 epochs & 16 batch_size` training:
+
+![test image](./test_image.png) ![predicted image](./pred_image_city.png)
+
 #### Does the project correctly label the road?
 Yes, I've tested the project on images from the dataset and here is the result:
 
