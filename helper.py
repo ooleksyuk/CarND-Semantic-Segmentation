@@ -77,7 +77,7 @@ def crop_image(image, gt_image):
 
 
 def flip_image(image, gt_image):
-    return np.flipud(image), np.flipud(gt_image)
+    return np.flip(image, axis=1), np.flip(gt_image, axis=1)
 
 
 def bc_img(img, s=1.0, m=0.0):
@@ -93,33 +93,9 @@ def process_gt_image(gt_image):
     background_color = np.array([255, 0, 0])
 
     gt_bg = np.all(gt_image == background_color, axis=2)
-    w = gt_bg.shape[0]
-    h = gt_bg.shape[1]
-    gt_bg = gt_bg.reshape(w, h, 1)
-    gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
-    return gt_image
-
-
-def process_gt_city_images(gt_image):
-    road_color = np.array([128, 64, 128, 255])
-    car_color = np.array([0, 0, 142, 255])
-    sign_color = np.array([220, 220, 0, 255])
-
-    gt_road = np.all(gt_image == road_color, axis=2)
-    gt_road = gt_road.reshape(*gt_road.shape, 1)
-
-    gt_car = np.all(gt_image == car_color, axis=2)
-    gt_car = gt_car.reshape(*gt_car.shape, 1)
-
-    gt_sing = np.all(gt_image == sign_color, axis=2)
-    gt_sing = gt_sing.reshape(*gt_sing.shape, 1)
-
-    gt_obj = np.concatenate((gt_road, gt_car, gt_sing), axis=2)
-    gt_bg = np.all(gt_obj == 0, axis=2)
-    gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+    gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
 
     gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
-
     return gt_image
 
 
@@ -196,6 +172,16 @@ def denoise_img(img):
     return ndimage.binary_propagation(eroded_img, mask=img)
 
 
+def paste_mask(street_im, im_soft_max, image_shape, color, obj_color_schema):
+    im_soft_max_r = im_soft_max[0][:, color].reshape(image_shape[0], image_shape[1])
+    segmentation_r = (im_soft_max_r > 0.5).reshape(image_shape[0], image_shape[1], 1)
+    mask = np.dot(segmentation_r, np.array(obj_color_schema))
+    mask = scipy.misc.toimage(mask, mode="RGBA")
+    street_im.paste(mask, box=None, mask=mask)
+
+    return street_im
+
+
 def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape):
     """
     Generate test output using the test images
@@ -209,16 +195,11 @@ def gen_test_output(sess, logits, keep_prob, image_pl, data_folder, image_shape)
     """
     for image_file in glob(os.path.join(data_folder, 'image_2', '*.png')):
         image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
-
-        im_softmax = sess.run(
-            [tf.nn.softmax(logits)],
-            {keep_prob: 1.0, image_pl: [image]})
-        im_softmax = im_softmax[0][:, 1].reshape(image_shape[0], image_shape[1])
-        segmentation = (im_softmax > 0.5).reshape(image_shape[0], image_shape[1], 1)
-        mask = np.dot(segmentation, np.array([[0, 255, 0, 127]]))
-        mask = scipy.misc.toimage(mask, mode="RGBA")
         street_im = scipy.misc.toimage(image)
-        street_im.paste(mask, box=None, mask=mask)
+
+        im_softmax = sess.run([tf.nn.softmax(logits)], {keep_prob: 1.0, image_pl: [image]})
+
+        street_im = paste_mask(street_im, im_softmax, image_shape, 1, [[0, 255, 0, 127]])
 
         yield os.path.basename(image_file), np.array(street_im)
 
@@ -237,6 +218,7 @@ def save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_p
     )
     for name, image in image_outputs:
         scipy.misc.imsave(os.path.join(output_dir, name), image)
+
 
 
 def plot_loss(runs_dir, loss, folder_name):

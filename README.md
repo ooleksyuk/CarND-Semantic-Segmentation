@@ -17,7 +17,7 @@ The `train_nn` function is implemented and prints time and loss per epoch/epochs
 The project trains model correctly, about 48s per epoch, 48sx20 epochs in total.
 #### Does the project use reasonable hyper parameters?
 I have trained model many times to figure out reasonable set of params.
-I used:
+For KITI data set I used:
 ```python
 L2_REG = 1e-5
 STDEV = 1e-2
@@ -28,12 +28,29 @@ BATCH_SIZE = 8
 IMAGE_SHAPE = (160, 576)
 NUM_CLASSES = 2
 ```
+For CityScapes dataset I used:
+```python
+L2_REG = 1e-5
+STDEV = 1e-2
+KEEP_PROB = 0.8
+LEARNING_RATE = 5e-4
+EPOCHS = 20
+BATCH_SIZE = 8
+IMAGE_SHAPE = (256, 512)
+```
+for CityScapes data set number of classes defined based on a list of classes provided by the set provider.
 #### Does the project correctly label the road?
 Yes, I've tested the project on images from the dataset and here is the result:
-![KITI data set](./kiti-dataset.gif)
+![KITI data set](./kiti-dataset-full.gif)
+KITI data set
+![CityScapes data set](./city-dataset.gif)
+CityScapes data set
 
 I was tracking the loss during the training and here is a graph that describes my results:
-![Cross-entropy loss](./loss_graph.png)
+![Cross-entropy loss for KITI data set](./loss_graph_kiti.png)
+Cross-entropy loss for KITI data set
+![Cross-entropy loss for CityScapes data set](./loss_graph_city.png)
+Cross-entropy loss for CityScapes data set
 
 #### Reflections
 To improve road recognition I've added image pre processing. In `helper.py` in `def gen_batch_function` I added image crop, image flip and changes to brightness and contrast of the image.
@@ -46,7 +63,8 @@ Skip connections are found to improve the segmentation accuracy, as discussed by
 I used these resources to learn more about [weight initialization](http://cs231n.github.io/neural-networks-2/#init) and [regularization](http://cs231n.github.io/neural-networks-2/#reg).
 To study more about Semantic Segmentation, I am going to use this resource - [A 2017 Guide to Semantic Segmentation with Deep Learning](http://blog.qure.ai/notes/semantic-segmentation-deep-learning-review).
 
-I am looking into working on [cityscapes data](https://www.cityscapes-dataset.com/), still awaiting account approval to download data set. 
+I have process ~20 labels from [cityscapes data](https://www.cityscapes-dataset.com/), code is located in `main-city.py` and `helper-cityscapes.py`.
+Code can be run `python3 main_city.py --epoch 20 --batch-size 16`. Code build using Python3.
 
 ### Setup
 ##### Frameworks and Packages
@@ -57,6 +75,7 @@ Make sure you have the following is installed:
  - [SciPy](https://www.scipy.org/)
 ##### Dataset
 Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the data set in the `data` folder.  This will create the folder `data_road` with all the training a test images.
+Download the [CityScapes dataset](https://www.cityscapes-dataset.com/) from [here](https://www.cityscapes-dataset.com/)
 
 ### Start
 ##### Implement

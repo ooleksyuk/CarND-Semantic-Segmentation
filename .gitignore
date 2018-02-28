@@ -17,6 +17,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+models/
 .eggs/
 lib/
 lib64/
@@ -103,4 +104,3 @@ ENV/
 # mypy
 .mypy_cache/
 
-RUNS/
