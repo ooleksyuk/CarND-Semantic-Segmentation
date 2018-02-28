@@ -41,15 +41,23 @@ IMAGE_SHAPE = (256, 512)
 for CityScapes data set number of classes defined based on a list of classes provided by the set provider.
 #### Does the project correctly label the road?
 Yes, I've tested the project on images from the dataset and here is the result:
+
 ![KITI data set](./kiti-dataset-full.gif)
+
 KITI data set
+
 ![CityScapes data set](./city-dataset.gif)
+
 CityScapes data set
 
 I was tracking the loss during the training and here is a graph that describes my results:
+
 ![Cross-entropy loss for KITI data set](./loss_graph_kiti.png)
+
 Cross-entropy loss for KITI data set
+
 ![Cross-entropy loss for CityScapes data set](./loss_graph_city.png)
+
 Cross-entropy loss for CityScapes data set
 
 #### Reflections
@@ -73,8 +81,10 @@ Make sure you have the following is installed:
  - [TensorFlow](https://www.tensorflow.org/)
  - [NumPy](http://www.numpy.org/)
  - [SciPy](https://www.scipy.org/)
+ 
 ##### Dataset
 Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php) from [here](http://www.cvlibs.net/download.php?file=data_road.zip).  Extract the data set in the `data` folder.  This will create the folder `data_road` with all the training a test images.
+
 Download the [CityScapes dataset](https://www.cityscapes-dataset.com/) from [here](https://www.cityscapes-dataset.com/)
 
 ### Start
