@@ -26,18 +26,18 @@ def rgb2bgr(tpl):
 # cf "The Cityscapes Dataset for Semantic Urban Scene Understanding"
 label_defs = [
     Label('unlabeled',     (0,     0,   0)),
-    #Label('dynamic',       (111,  74,   0)),
-    #Label('ground',        ( 81,   0,  81)),
+    Label('dynamic',       (111,  74,   0)),
+    Label('ground',        ( 81,   0,  81)),
     Label('road',          (128,  64, 128)),
     Label('sidewalk',      (244,  35, 232)),
-    #Label('parking',       (250, 170, 160)),
-    #Label('rail track',    (230, 150, 140)),
+    Label('parking',       (250, 170, 160)),
+    Label('rail track',    (230, 150, 140)),
     Label('building',      ( 70,  70,  70)),
     Label('wall',          (102, 102, 156)),
     Label('fence',         (190, 153, 153)),
-    #Label('guard rail',    (180, 165, 180)),
-    #Label('bridge',        (150, 100, 100)),
-    #Label('tunnel',        (150, 120,  90)),
+    Label('guard rail',    (180, 165, 180)),
+    Label('bridge',        (150, 100, 100)),
+    Label('tunnel',        (150, 120,  90)),
     Label('pole',          (153, 153, 153)),
     Label('traffic light', (250, 170,  30)),
     Label('traffic sign',  (220, 220,   0)),
@@ -49,8 +49,8 @@ label_defs = [
     Label('car',           (  0,   0, 142)),
     Label('truck',         (  0,   0,  70)),
     Label('bus',           (  0,  60, 100)),
-    #Label('caravan',       (  0,   0,  90)),
-    #Label('trailer',       (  0,   0, 110)),
+    Label('caravan',       (  0,   0,  90)),
+    Label('trailer',       (  0,   0, 110)),
     Label('train',         (  0,  80, 100)),
     Label('motorcycle',    (  0,   0, 230)),
     Label('bicycle',       (119, 11, 32))]
@@ -87,6 +87,42 @@ def load_data(data_folder):
     return train_images, valid_images, test_images, num_classes, label_colors, image_shape
 
 
+def img_size(image):
+    return image.shape[0], image.shape[1]
+
+
+def crop_image(image, gt_image):
+    h, w = img_size(image)
+    nw = random.randint(1150, w-5)  # Random crop size
+    nh = int(nw / 3.3) # Keep original aspect ration
+    x1 = random.randint(0, w - nw)  # Random position of crop
+    y1 = random.randint(0, h - nh)
+    return image[y1:(y1+nh), x1:(x1+nw), :], gt_image[y1:(y1+nh), x1:(x1+nw), :]
+
+
+def flip_image(image, gt_image):
+    return np.flip(image, axis=1), np.flip(gt_image, axis=1)
+
+
+def bc_img(img, s=1.0, m=0.0):
+    img = img.astype(np.int)
+    img = img * s + m
+    img[img > 255] = 255
+    img[img < 0] = 0
+    img = img.astype(np.uint8)
+    return img
+
+
+def process_gt_image(gt_image):
+    background_color = np.array([255, 0, 0])
+
+    gt_bg = np.all(gt_image == background_color, axis=2)
+    gt_bg = gt_bg.reshape(gt_bg.shape[0], gt_bg.shape[1], 1)
+
+    gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
+    return gt_image
+
+
 def gen_batch_function(image_paths, image_shape):
     """
     Generate function to create batches of training data
@@ -113,6 +149,10 @@ def gen_batch_function(image_paths, image_shape):
 
                 image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
                 gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file, mode='RGB'), image_shape)
+
+                contrast = random.uniform(0.85, 1.15)  # Contrast augmentation
+                bright = random.randint(-45, 30)  # Brightness augmentation
+                image = bc_img(image, contrast, bright)
 
                 label_bg = np.zeros([image_shape[0], image_shape[1]], dtype=bool)
                 label_list = []
