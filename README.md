@@ -43,6 +43,7 @@ Cityscapes test image vs predicted result after `20 epochs & 16 batch_size` trai
 
 ![test image](./test_image.png) ![predicted image](./pred_image_city.png)
 
+More results can be see in `runs/` directory.
 #### Does the project correctly label the road?
 Yes, I've tested the project on images from the dataset and here is the result:
 
